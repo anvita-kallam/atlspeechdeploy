@@ -350,9 +350,15 @@ st.markdown(
       font-family: inherit !important;
     }
     
-    /* Ensure no text rendering issues with widget keys */
-    *[key*="dropdown"], *[key*="checkbox"], *[key*="button"] {
-      display: none !important;
+    /* Hide any text content that looks like widget keys being displayed */
+    /* Using a more specific approach: target Streamlit's internal widget containers */
+    [data-testid*="baseButton"]::before,
+    [data-testid*="baseButton"]::after,
+    [data-testid*="stSelectbox"]::before,
+    [data-testid*="stSelectbox"]::after,
+    [data-testid*="stCheckbox"]::before,
+    [data-testid*="stCheckbox"]::after {
+      content: none !important;
     }
     
     .stApp {
