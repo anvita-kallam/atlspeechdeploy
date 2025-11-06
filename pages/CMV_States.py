@@ -382,13 +382,13 @@ st.markdown(
       position: relative;
     }
     
-    /* Prevent absolute positioning overlap in custom elements only */
-    .section-header *,
-    .card *,
-    .stat-block *,
-    .page-title *,
-    .subtitle * {
-      position: relative !important;
+    /* Prevent absolute positioning overlap in custom elements only - but don't affect Streamlit internals */
+    .section-header,
+    .card,
+    .stat-block,
+    .page-title,
+    .subtitle {
+      position: relative;
     }
     
     .card {
@@ -440,17 +440,7 @@ st.markdown(
       background: linear-gradient(135deg, var(--green-medium) 0%, var(--green-dark) 100%);
     }
     
-    /* Selectbox and input styling */
-    .stSelectbox > div > div {
-      background: var(--off-white);
-      border-radius: 12px;
-      border: 2px solid rgba(168, 230, 207, 0.4);
-    }
-    
-    .stSelectbox > div > div:focus-within {
-      border-color: var(--green-medium);
-      box-shadow: 0 0 0 3px var(--shadow-soft);
-    }
+    /* Selectbox styling removed to prevent arrow glitching */
     
     .stCheckbox {
       color: var(--text-dark);
@@ -479,12 +469,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<div class='page-title'>🌿 CMV-Required States: 1–3–6 Outcomes 🌱</div>", unsafe_allow_html=True)
+st.markdown("<div class='page-title'>CMV-Required States: 1–3–6 Outcomes</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Connecticut, Florida, Iowa, Kentucky, New York, Pennsylvania, Utah, Virginia</div>", unsafe_allow_html=True)
 
 # Load data
 with st.sidebar:
-    st.markdown("### 🌿 CMV States Filters")
+    st.markdown("### CMV States Filters")
     try:
         data_df = prepare_data(OUTCOME_FILE, PROGRAM_FILE)
         available_metrics = [m for m in METRIC_COLUMNS_CANONICAL.keys() if m in data_df.columns]
@@ -512,7 +502,7 @@ if cmv_df.empty:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("<div class='section-header'>🍃 Distribution by Program Presence (CMV States + Georgia)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Distribution by Program Presence (CMV States + Georgia)</div>", unsafe_allow_html=True)
     tmp = cmv_df_viz.dropna(subset=[selected_metric]).copy()
     if not tmp.empty:
         tmp["Program"] = tmp[STANDARD_COLUMN_PROGRAM].map({True: "With Program", False: "Without Program"})
@@ -534,7 +524,7 @@ with col1:
         st.info(f"No data available for {selected_metric}.")
 
 with col2:
-    st.markdown("<div class='section-header'>🌍 U.S. Choropleth (CMV States + Georgia Highlighted)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>U.S. Choropleth (CMV States + Georgia Highlighted)</div>", unsafe_allow_html=True)
     tmp = cmv_df_viz.dropna(subset=[selected_metric, "State_Code"]).copy()
     if not tmp.empty:
         # Aggregate by state if multiple years exist (take most recent year)
@@ -573,7 +563,7 @@ with col2:
 
 # Scattergram: Selected Outcome vs Audiologists per 100k (CMV States + Georgia)
 if "Audiologists_per_100k" in cmv_df_viz.columns and selected_metric in cmv_df_viz.columns:
-    st.markdown("<div class='section-header'>📊 Outcome vs Audiologists per 100k Population (CMV States + Georgia)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Outcome vs Audiologists per 100k Population (CMV States + Georgia)</div>", unsafe_allow_html=True)
     
     tmp = cmv_df_viz.dropna(subset=[selected_metric, "Audiologists_per_100k"]).copy()
     if not tmp.empty:
@@ -666,7 +656,7 @@ elif "Audiologists_per_100k" not in cmv_df_viz.columns:
     st.info("Audiologists per 100k data not available.")
 
 # Statistical Results
-st.markdown("<div class='section-header'>📈 Statistical Analysis (CMV States Only)</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-header'>Statistical Analysis (CMV States Only)</div>", unsafe_allow_html=True)
 stats_dict = compute_group_stats(cmv_df, selected_metric)
 
 st.markdown("<div class='card'>", unsafe_allow_html=True)

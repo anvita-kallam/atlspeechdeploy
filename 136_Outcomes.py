@@ -421,13 +421,13 @@ st.markdown(
       background: linear-gradient(180deg, #ffffff 0%, #f8f9f8 100%);
     }
     
-    /* Prevent absolute positioning overlap in custom elements only */
-    .section-header *,
-    .card *,
-    .stat-block *,
-    .page-title *,
-    .subtitle * {
-      position: relative !important;
+    /* Prevent absolute positioning overlap in custom elements only - but don't affect Streamlit internals */
+    .section-header,
+    .card,
+    .stat-block,
+    .page-title,
+    .subtitle {
+      position: relative;
     }
     
     /* Button styling */
@@ -449,17 +449,7 @@ st.markdown(
       background: linear-gradient(135deg, var(--green-medium) 0%, var(--green-dark) 100%);
     }
     
-    /* Selectbox and input styling */
-    .stSelectbox > div > div {
-      background: var(--off-white);
-      border-radius: 12px;
-      border: 2px solid rgba(168, 230, 207, 0.4);
-    }
-    
-    .stSelectbox > div > div:focus-within {
-      border-color: var(--green-medium);
-      box-shadow: 0 0 0 3px var(--shadow-soft);
-    }
+    /* Selectbox styling removed to prevent arrow glitching */
     
     .stCheckbox {
       color: var(--text-dark);
@@ -513,11 +503,11 @@ st.markdown(
 
 # No background image injection
 
-st.markdown("<div class='page-title'>🌿 Impact of Audiology Program Presence on 1-3-6 Outcomes 🌱</div>", unsafe_allow_html=True)
+st.markdown("<div class='page-title'>Impact of Audiology Program Presence on 1-3-6 Outcomes</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Explore whether audiology programs are associated with improved 1–3–6 outcomes</div>", unsafe_allow_html=True)
 
 with st.sidebar:
-    st.markdown("### 🌿 Filters")
+    st.markdown("### Filters")
     try:
         data_df = prepare_data(OUTCOME_FILE, PROGRAM_FILE)
         available_metrics = [m for m in METRIC_COLUMNS_CANONICAL.keys() if m in data_df.columns]
@@ -552,7 +542,7 @@ filtered = filter_dataframe(data_df, include_ga)
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("<div class='section-header'>🍃 With vs Without Audiology Program</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>With vs Without Audiology Program</div>", unsafe_allow_html=True)
     if selected_metric in filtered.columns:
         tmp = filtered.dropna(subset=[selected_metric]).copy()
         tmp["Program"] = np.where(tmp[STANDARD_COLUMN_PROGRAM], "With Program", "Without Program")
@@ -581,7 +571,7 @@ with col1:
         st.info("Selected metric not found in data.")
 
 with col2:
-    st.markdown("<div class='section-header'>🌿 Outcome vs Program Presence (Binary)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Outcome vs Program Presence (Binary)</div>", unsafe_allow_html=True)
     if selected_metric in filtered.columns:
         tmp = filtered.dropna(subset=[selected_metric]).copy()
         tmp["Program"] = np.where(tmp[STANDARD_COLUMN_PROGRAM], 1, 0)
@@ -602,7 +592,7 @@ with col2:
     else:
         st.info("Selected metric not found in data.")
 
-st.markdown("<div class='section-header'>🌍 U.S. Choropleth</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-header'>U.S. Choropleth</div>", unsafe_allow_html=True)
 if (selected_metric in filtered.columns) and ("State_Code" in filtered.columns) and not filtered["State_Code"].isna().all():
     tmp = filtered.dropna(subset=[selected_metric, "State_Code"]).copy()
     # Aggregate by state: take the most recent value (or average if no Year column)
@@ -657,7 +647,7 @@ else:
 
 # Scattergram: Selected Outcome vs Audiologists per 100k
 if "Audiologists_per_100k" in filtered.columns and selected_metric in filtered.columns:
-    st.markdown("<div class='section-header'>📊 Outcome vs Audiologists per 100k Population</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Outcome vs Audiologists per 100k Population</div>", unsafe_allow_html=True)
     
     tmp = filtered.dropna(subset=[selected_metric, "Audiologists_per_100k"]).copy()
     if not tmp.empty:
@@ -726,7 +716,7 @@ elif "Audiologists_per_100k" not in filtered.columns:
     st.info("Audiologists per 100k data not available.")
 
 
-st.markdown("<div class='section-header'>📈 Statistical Results</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-header'>Statistical Results</div>", unsafe_allow_html=True)
 stats_dict = compute_group_stats(filtered, selected_metric)
 stats_lines = []
 stats_lines.append(f"Metric: {selected_metric}")
@@ -758,7 +748,7 @@ st.markdown(
     """
 )
 
-st.markdown("<div class='section-header'>🌳 Conclusion</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-header'>Conclusion</div>", unsafe_allow_html=True)
 st.write(generate_conclusion(stats_dict, selected_metric, include_ga))
 
 
