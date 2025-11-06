@@ -331,7 +331,7 @@ st.markdown(
     }
     
     .stApp {
-      background: linear-gradient(135deg, var(--green-light) 0%, var(--beige) 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9f8 100%);
       background-attachment: fixed;
     }
     
@@ -376,6 +376,19 @@ st.markdown(
       color: var(--text-dark);
       box-shadow: 0 2px 8px var(--shadow-soft);
       font-family: 'Poppins', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+    }
+    
+    /* Prevent absolute positioning overlap in custom elements only */
+    .section-header *,
+    .card *,
+    .stat-block *,
+    .page-title *,
+    .subtitle * {
+      position: relative !important;
     }
     
     .card {
@@ -385,6 +398,8 @@ st.markdown(
       box-shadow: 0 4px 20px var(--shadow-soft);
       border: 1px solid rgba(168, 230, 207, 0.3);
       backdrop-filter: blur(10px);
+      display: block;
+      position: relative;
     }
     
     .stat-block {
@@ -402,16 +417,19 @@ st.markdown(
     }
     
     /* Sidebar styling */
-    .css-1d391kg {
-      background: linear-gradient(180deg, var(--green-light) 0%, var(--beige) 100%);
-    }
-    
     [data-testid="stSidebar"] {
-      background: linear-gradient(180deg, var(--green-light) 0%, var(--beige) 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #f8f9f8 100%);
     }
     
-    [data-testid="stSidebar"] .css-1d391kg {
-      background: transparent;
+    /* Revert Streamlit default arrows/icons - don't override */
+    [data-testid="stSidebar"] svg,
+    [data-testid="stAppViewContainer"] svg,
+    .stExpander svg,
+    .stSelectbox svg,
+    button svg,
+    .stButton svg {
+      position: relative !important;
+      display: inline-block !important;
     }
     
     /* Button styling */
