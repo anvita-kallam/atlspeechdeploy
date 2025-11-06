@@ -307,73 +307,177 @@ def compute_group_stats(df: pd.DataFrame, metric: str) -> dict:
 # ===========================
 st.set_page_config(page_title="CMV States - 1-3-6 Outcomes", layout="wide")
 
-# Global CSS styling (same as main app)
+# Global CSS styling - Nature-inspired theme (same as main app)
 st.markdown(
     """
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
     :root {
-      --brand: #3a7bd5;
-      --brand-dark: #264b96;
-      --muted: #6c757d;
-      --bg: #ffffff;
-      --card-bg: #ffffff;
-      --accent: #22c55e;
+      --green-light: #e8f5e9;
+      --green-soft: #a8e6cf;
+      --green-medium: #56ab2f;
+      --green-dark: #2d5016;
+      --beige: #f5f1e8;
+      --beige-dark: #e8e0d3;
+      --off-white: #fafafa;
+      --text-dark: #2d5016;
+      --text-muted: #5a7c3f;
+      --shadow-soft: rgba(86, 171, 47, 0.1);
+      --shadow-medium: rgba(86, 171, 47, 0.15);
     }
+    
+    * {
+      font-family: 'Poppins', 'Lato', sans-serif !important;
+    }
+    
     .stApp {
-      background-color: var(--bg);
+      background: linear-gradient(135deg, var(--green-light) 0%, var(--beige) 100%);
+      background-attachment: fixed;
     }
-    h1, h2, h3 {
-      color: var(--brand-dark) !important;
+    
+    .main .block-container {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
     }
+    
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--text-dark) !important;
+      font-family: 'Poppins', sans-serif !important;
+      font-weight: 600;
+    }
+    
     .page-title {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(90deg, var(--brand), var(--accent));
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--green-medium) 0%, var(--green-soft) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       margin-bottom: 0.5rem;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: -0.5px;
     }
+    
     .subtitle {
-      color: var(--muted);
-      margin-bottom: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 300;
+      font-family: 'Lato', sans-serif;
     }
+    
     .section-header {
-      padding: 0.6rem 0.9rem;
-      border-left: 4px solid var(--brand);
-      background: rgba(58, 123, 213, 0.08);
-      border-radius: 6px;
-      margin: 0.5rem 0 0.75rem 0;
-      font-weight: 700;
+      padding: 0.8rem 1.2rem;
+      border-left: 5px solid var(--green-medium);
+      background: linear-gradient(90deg, rgba(168, 230, 207, 0.2) 0%, rgba(168, 230, 207, 0.05) 100%);
+      border-radius: 12px;
+      margin: 0.8rem 0 1rem 0;
+      font-weight: 600;
+      color: var(--text-dark);
+      box-shadow: 0 2px 8px var(--shadow-soft);
+      font-family: 'Poppins', sans-serif;
     }
+    
     .card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      padding: 0.75rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      border: 1px solid rgba(38,75,150,0.08);
+      background: var(--off-white);
+      border-radius: 16px;
+      padding: 1.2rem;
+      box-shadow: 0 4px 20px var(--shadow-soft);
+      border: 1px solid rgba(168, 230, 207, 0.3);
+      backdrop-filter: blur(10px);
     }
+    
     .stat-block {
-      background: var(--card-bg);
-      border-radius: 10px;
-      padding: 1rem;
-      border: 1px dashed rgba(38,75,150,0.2);
+      background: linear-gradient(135deg, var(--beige) 0%, var(--off-white) 100%);
+      border-radius: 16px;
+      padding: 1.2rem;
+      border: 2px dashed rgba(86, 171, 47, 0.3);
+      box-shadow: 0 2px 12px var(--shadow-soft);
     }
+    
     .note {
       font-size: 0.9rem;
-      color: var(--muted);
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+      background: linear-gradient(180deg, var(--green-light) 0%, var(--beige) 100%);
+    }
+    
+    [data-testid="stSidebar"] {
+      background: linear-gradient(180deg, var(--green-light) 0%, var(--beige) 100%);
+    }
+    
+    [data-testid="stSidebar"] .css-1d391kg {
+      background: transparent;
+    }
+    
+    /* Button styling */
+    .stButton > button {
+      background: linear-gradient(135deg, var(--green-soft) 0%, var(--green-medium) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 4px 12px var(--shadow-medium);
+      transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px var(--shadow-medium);
+      background: linear-gradient(135deg, var(--green-medium) 0%, var(--green-dark) 100%);
+    }
+    
+    /* Selectbox and input styling */
+    .stSelectbox > div > div {
+      background: var(--off-white);
+      border-radius: 12px;
+      border: 2px solid rgba(168, 230, 207, 0.4);
+    }
+    
+    .stSelectbox > div > div:focus-within {
+      border-color: var(--green-medium);
+      box-shadow: 0 0 0 3px var(--shadow-soft);
+    }
+    
+    .stCheckbox {
+      color: var(--text-dark);
+    }
+    
+    /* Info boxes */
+    .stInfo {
+      background: linear-gradient(135deg, rgba(168, 230, 207, 0.2) 0%, rgba(168, 230, 207, 0.1) 100%);
+      border-left: 4px solid var(--green-medium);
+      border-radius: 12px;
+    }
+    
+    /* Expander styling */
+    .stExpander {
+      background: var(--off-white);
+      border-radius: 12px;
+      border: 1px solid rgba(168, 230, 207, 0.3);
+    }
+    
+    /* Text colors */
+    .stMarkdown, p, li {
+      color: var(--text-dark);
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-st.markdown("<div class='page-title'>CMV-Required States: 1–3–6 Outcomes</div>", unsafe_allow_html=True)
+st.markdown("<div class='page-title'>🌿 CMV-Required States: 1–3–6 Outcomes 🌱</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Connecticut, Florida, Iowa, Kentucky, New York, Pennsylvania, Utah, Virginia</div>", unsafe_allow_html=True)
 
 # Load data
 with st.sidebar:
-    st.header("CMV States Filters")
+    st.markdown("### 🌿 CMV States Filters")
     try:
         data_df = prepare_data(OUTCOME_FILE, PROGRAM_FILE)
         available_metrics = [m for m in METRIC_COLUMNS_CANONICAL.keys() if m in data_df.columns]
