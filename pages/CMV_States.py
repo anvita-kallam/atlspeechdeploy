@@ -453,12 +453,7 @@ st.markdown(
       border-radius: 12px;
     }
     
-    /* Expander styling */
-    .stExpander {
-      background: var(--off-white);
-      border-radius: 12px;
-      border: 1px solid rgba(168, 230, 207, 0.3);
-    }
+    /* Expander styling removed to prevent arrow glitching */
     
     /* Text colors */
     .stMarkdown, p, li {
