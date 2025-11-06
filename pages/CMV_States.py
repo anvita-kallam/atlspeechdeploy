@@ -326,8 +326,14 @@ st.markdown(
       --shadow-medium: rgba(86, 171, 47, 0.15);
     }
     
-    * {
-      font-family: 'Poppins', 'Lato', sans-serif !important;
+    /* Font family applied selectively to avoid interfering with Streamlit widgets */
+    body, .stMarkdown, p, h1, h2, h3, h4, h5, h6 {
+      font-family: 'Poppins', 'Lato', sans-serif;
+    }
+    
+    /* Ensure Streamlit widgets use their default fonts */
+    .stSelectbox, .stCheckbox, .stButton, button, input, select {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     }
     
     .stApp {
@@ -376,10 +382,8 @@ st.markdown(
       color: var(--text-dark);
       box-shadow: 0 2px 8px var(--shadow-soft);
       font-family: 'Poppins', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
       position: relative;
+      display: block;
     }
     
     /* Prevent absolute positioning overlap in custom elements only - but don't affect Streamlit internals */
@@ -442,9 +446,7 @@ st.markdown(
     
     /* Selectbox styling removed to prevent arrow glitching */
     
-    .stCheckbox {
-      color: var(--text-dark);
-    }
+    /* Checkbox styling removed to prevent widget key display issues */
     
     /* Info boxes */
     .stInfo {
