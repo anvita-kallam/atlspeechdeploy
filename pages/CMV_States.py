@@ -218,6 +218,12 @@ def filter_cmv(df: pd.DataFrame) -> pd.DataFrame:
     return df[df[STANDARD_COLUMN_STATE].isin(CMV_STATES)].copy()
 
 
+def filter_cmv_with_georgia(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter dataframe to include CMV-required states plus Georgia."""
+    cmv_states_with_ga = CMV_STATES | {"Georgia"}
+    return df[df[STANDARD_COLUMN_STATE].isin(cmv_states_with_ga)].copy()
+
+
 def compute_group_stats(df: pd.DataFrame, metric: str) -> dict:
     """Compute statistical tests for CMV states only."""
     if metric not in df.columns:
@@ -385,17 +391,18 @@ if data_df.empty or not selected_metric:
     st.stop()
 
 cmv_df = filter_cmv(data_df)
+cmv_df_viz = filter_cmv_with_georgia(data_df)  # Include Georgia for visualizations
 
 if cmv_df.empty:
     st.warning("No CMV states found in the data.")
     st.stop()
 
-# Visualizations
+# Visualizations (includes Georgia)
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("<div class='section-header'>Distribution by Program Presence (CMV States)</div>", unsafe_allow_html=True)
-    tmp = cmv_df.dropna(subset=[selected_metric]).copy()
+    st.markdown("<div class='section-header'>Distribution by Program Presence (CMV States + Georgia)</div>", unsafe_allow_html=True)
+    tmp = cmv_df_viz.dropna(subset=[selected_metric]).copy()
     if not tmp.empty:
         tmp["Program"] = tmp[STANDARD_COLUMN_PROGRAM].map({True: "With Program", False: "Without Program"})
         fig_box = px.box(
@@ -416,8 +423,8 @@ with col1:
         st.info(f"No data available for {selected_metric}.")
 
 with col2:
-    st.markdown("<div class='section-header'>U.S. Choropleth (CMV States Highlighted)</div>", unsafe_allow_html=True)
-    tmp = cmv_df.dropna(subset=[selected_metric, "State_Code"]).copy()
+    st.markdown("<div class='section-header'>U.S. Choropleth (CMV States + Georgia Highlighted)</div>", unsafe_allow_html=True)
+    tmp = cmv_df_viz.dropna(subset=[selected_metric, "State_Code"]).copy()
     if not tmp.empty:
         # Aggregate by state if multiple years exist (take most recent year)
         if "Year" in tmp.columns:
@@ -453,11 +460,11 @@ with col2:
     else:
         st.info(f"No data available for {selected_metric} choropleth.")
 
-# Scattergram: Selected Outcome vs Audiologists per 100k (CMV States)
-if "Audiologists_per_100k" in cmv_df.columns and selected_metric in cmv_df.columns:
-    st.markdown("<div class='section-header'>Outcome vs Audiologists per 100k Population (CMV States)</div>", unsafe_allow_html=True)
+# Scattergram: Selected Outcome vs Audiologists per 100k (CMV States + Georgia)
+if "Audiologists_per_100k" in cmv_df_viz.columns and selected_metric in cmv_df_viz.columns:
+    st.markdown("<div class='section-header'>Outcome vs Audiologists per 100k Population (CMV States + Georgia)</div>", unsafe_allow_html=True)
     
-    tmp = cmv_df.dropna(subset=[selected_metric, "Audiologists_per_100k"]).copy()
+    tmp = cmv_df_viz.dropna(subset=[selected_metric, "Audiologists_per_100k"]).copy()
     if not tmp.empty:
         # Aggregate by state if multiple years exist (take most recent year)
         if "Year" in tmp.columns:
@@ -473,11 +480,16 @@ if "Audiologists_per_100k" in cmv_df.columns and selected_metric in cmv_df.colum
                 STANDARD_COLUMN_PROGRAM: 'first',
             })
         
+        # Separate Georgia from CMV states for trendline calculation
+        tmp_cmv = tmp[tmp[STANDARD_COLUMN_STATE] != "Georgia"].copy()
+        tmp_georgia = tmp[tmp[STANDARD_COLUMN_STATE] == "Georgia"].copy()
+        
+        # Create scatterplot with CMV states only (Georgia will be added separately)
         fig_scatter = px.scatter(
-            tmp,
+            tmp_cmv,
             x="Audiologists_per_100k",
             y=selected_metric,
-            color=tmp[STANDARD_COLUMN_PROGRAM].map({True: "With Program", False: "Without Program"}),
+            color=tmp_cmv[STANDARD_COLUMN_PROGRAM].map({True: "With Program", False: "Without Program"}),
             color_discrete_sequence=px.colors.sequential.Viridis,
             hover_name=STANDARD_COLUMN_STATE,
             hover_data={STANDARD_COLUMN_PROGRAM: True, selected_metric: ":.2f", "Audiologists_per_100k": ":.1f"},
@@ -486,10 +498,29 @@ if "Audiologists_per_100k" in cmv_df.columns and selected_metric in cmv_df.colum
         # Remove the program presence legend items
         fig_scatter.update_traces(showlegend=False, selector=dict(type='scatter', mode='markers'))
         
-        # Add single OLS trendline for all data (not separate by program)
-        if tmp.shape[0] >= 3:
-            x_vals = tmp["Audiologists_per_100k"].values
-            y_vals = tmp[selected_metric].values
+        # Highlight Georgia if present (excluded from trendline)
+        if not tmp_georgia.empty:
+            ga_hover = [
+                f"{row[STANDARD_COLUMN_STATE]}<br>"
+                f"{selected_metric}: {row[selected_metric]:.2f}%<br>"
+                f"Audiologists per 100k: {row['Audiologists_per_100k']:.1f}"
+                for _, row in tmp_georgia.iterrows()
+            ]
+            fig_scatter.add_scatter(
+                x=tmp_georgia["Audiologists_per_100k"],
+                y=tmp_georgia[selected_metric],
+                mode='markers',
+                name='Georgia (excluded from trendline)',
+                marker=dict(size=12, symbol='star', color='orange', line=dict(width=2, color='darkorange')),
+                hovertext=ga_hover,
+                hoverinfo='text',
+                showlegend=True,
+            )
+        
+        # Add single OLS trendline for CMV states only (excluding Georgia)
+        if tmp_cmv.shape[0] >= 3:
+            x_vals = tmp_cmv["Audiologists_per_100k"].values
+            y_vals = tmp_cmv[selected_metric].values
             # Simple linear regression
             x_mean = np.mean(x_vals)
             y_mean = np.mean(y_vals)
@@ -505,7 +536,7 @@ if "Audiologists_per_100k" in cmv_df.columns and selected_metric in cmv_df.colum
                     x=x_trend,
                     y=y_trend,
                     mode='lines',
-                    name='OLS Trendline',
+                    name='OLS Trendline (CMV States only)',
                     line=dict(color='rgba(68, 1, 84, 0.6)', width=2, dash='dash'),
                     showlegend=True,
                 )
@@ -520,7 +551,7 @@ if "Audiologists_per_100k" in cmv_df.columns and selected_metric in cmv_df.colum
         st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info(f"No data available for {selected_metric} vs Audiologists per 100k.")
-elif "Audiologists_per_100k" not in cmv_df.columns:
+elif "Audiologists_per_100k" not in cmv_df_viz.columns:
     st.info("Audiologists per 100k data not available.")
 
 # Statistical Results
