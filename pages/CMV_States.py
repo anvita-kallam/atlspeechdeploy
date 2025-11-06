@@ -421,17 +421,6 @@ st.markdown(
       background: linear-gradient(180deg, #ffffff 0%, #f8f9f8 100%);
     }
     
-    /* Revert Streamlit default arrows/icons - don't override */
-    [data-testid="stSidebar"] svg,
-    [data-testid="stAppViewContainer"] svg,
-    .stExpander svg,
-    .stSelectbox svg,
-    button svg,
-    .stButton svg {
-      position: relative !important;
-      display: inline-block !important;
-    }
-    
     /* Button styling */
     .stButton > button {
       background: linear-gradient(135deg, var(--green-soft) 0%, var(--green-medium) 100%);

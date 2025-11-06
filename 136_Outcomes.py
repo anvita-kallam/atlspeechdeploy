@@ -421,17 +421,6 @@ st.markdown(
       background: linear-gradient(180deg, #ffffff 0%, #f8f9f8 100%);
     }
     
-    /* Revert Streamlit default arrows/icons - don't override */
-    [data-testid="stSidebar"] svg,
-    [data-testid="stAppViewContainer"] svg,
-    .stExpander svg,
-    .stSelectbox svg,
-    button svg,
-    .stButton svg {
-      position: relative !important;
-      display: inline-block !important;
-    }
-    
     /* Prevent absolute positioning overlap in custom elements only */
     .section-header *,
     .card *,
