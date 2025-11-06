@@ -331,9 +331,19 @@ st.markdown(
       font-family: 'Poppins', 'Lato', sans-serif;
     }
     
-    /* Ensure Streamlit widgets use their default fonts */
+    /* Ensure Streamlit widgets use their default fonts and rendering */
     .stSelectbox, .stCheckbox, .stButton, button, input, select {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    }
+    
+    /* Prevent CSS from interfering with Streamlit widget key rendering */
+    [data-testid*="stWidget"], [data-baseweb], .stWidget {
+      font-family: inherit !important;
+    }
+    
+    /* Ensure no text rendering issues with widget keys */
+    *[key*="dropdown"], *[key*="checkbox"], *[key*="button"] {
+      display: none !important;
     }
     
     .stApp {
@@ -482,7 +492,7 @@ with st.sidebar:
         data_df = pd.DataFrame(columns=[STANDARD_COLUMN_STATE, STANDARD_COLUMN_PROGRAM] + list(METRIC_COLUMNS_CANONICAL.keys()))
         available_metrics = [m for m in METRIC_COLUMNS_CANONICAL.keys() if m in data_df.columns]
 
-    selected_metric = st.selectbox("Outcome Metric", options=available_metrics, index=0 if available_metrics else None)
+    selected_metric = st.selectbox("Outcome Metric", options=available_metrics, index=0 if available_metrics else None, key="cmv_metric_select")
 
 if data_df.empty or not selected_metric:
     st.warning("No data available.")

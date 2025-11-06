@@ -340,9 +340,19 @@ st.markdown(
       font-family: 'Poppins', 'Lato', sans-serif;
     }
     
-    /* Ensure Streamlit widgets use their default fonts */
+    /* Ensure Streamlit widgets use their default fonts and rendering */
     .stSelectbox, .stCheckbox, .stButton, button, input, select {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    }
+    
+    /* Prevent CSS from interfering with Streamlit widget key rendering */
+    [data-testid*="stWidget"], [data-baseweb], .stWidget {
+      font-family: inherit !important;
+    }
+    
+    /* Ensure no text rendering issues with widget keys */
+    *[key*="dropdown"], *[key*="checkbox"], *[key*="button"] {
+      display: none !important;
     }
     
     .stApp {
@@ -515,9 +525,9 @@ with st.sidebar:
         data_df = pd.DataFrame(columns=[STANDARD_COLUMN_STATE, STANDARD_COLUMN_PROGRAM] + list(METRIC_COLUMNS_CANONICAL.keys()))
         available_metrics = [m for m in METRIC_COLUMNS_CANONICAL.keys() if m in data_df.columns]
 
-    selected_metric = st.selectbox("Outcome Metric", options=available_metrics, index=0 if available_metrics else None)
-    include_ga = st.checkbox("Include Georgia", value=True)
-    with st.expander("Data summary", expanded=False):
+    selected_metric = st.selectbox("Outcome Metric", options=available_metrics, index=0 if available_metrics else None, key="main_metric_select")
+    include_ga = st.checkbox("Include Georgia", value=True, key="main_include_ga")
+    with st.expander("Data summary", expanded=False, key="main_data_summary"):
         st.write({
             "rows": int(data_df.shape[0]) if not data_df.empty else 0,
             "columns": list(data_df.columns),
