@@ -533,7 +533,7 @@ with st.sidebar:
 
     selected_metric = st.selectbox("Outcome Metric", options=available_metrics, index=0 if available_metrics else None, key="main_metric_select")
     include_ga = st.checkbox("Include Georgia", value=True, key="main_include_ga")
-    with st.expander("Data summary", expanded=False, key="main_data_summary"):
+    with st.expander("Data summary", expanded=False):
         st.write({
             "rows": int(data_df.shape[0]) if not data_df.empty else 0,
             "columns": list(data_df.columns),
