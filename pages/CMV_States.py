@@ -453,6 +453,76 @@ with col2:
     else:
         st.info(f"No data available for {selected_metric} choropleth.")
 
+# Scattergram: Selected Outcome vs Audiologists per 100k (CMV States)
+if "Audiologists_per_100k" in cmv_df.columns and selected_metric in cmv_df.columns:
+    st.markdown("<div class='section-header'>Outcome vs Audiologists per 100k Population (CMV States)</div>", unsafe_allow_html=True)
+    
+    tmp = cmv_df.dropna(subset=[selected_metric, "Audiologists_per_100k"]).copy()
+    if not tmp.empty:
+        # Aggregate by state if multiple years exist (take most recent year)
+        if "Year" in tmp.columns:
+            tmp = tmp.sort_values("Year", ascending=False).groupby(STANDARD_COLUMN_STATE).agg({
+                selected_metric: 'first',
+                "Audiologists_per_100k": 'first',
+                STANDARD_COLUMN_PROGRAM: 'first',
+            }).reset_index()
+        else:
+            tmp = tmp.groupby(STANDARD_COLUMN_STATE, as_index=False).agg({
+                selected_metric: 'mean',
+                "Audiologists_per_100k": 'first',
+                STANDARD_COLUMN_PROGRAM: 'first',
+            })
+        
+        fig_scatter = px.scatter(
+            tmp,
+            x="Audiologists_per_100k",
+            y=selected_metric,
+            color=tmp[STANDARD_COLUMN_PROGRAM].map({True: "With Program", False: "Without Program"}),
+            color_discrete_sequence=px.colors.sequential.Viridis,
+            hover_name=STANDARD_COLUMN_STATE,
+            hover_data={STANDARD_COLUMN_PROGRAM: True, selected_metric: ":.2f", "Audiologists_per_100k": ":.1f"},
+        )
+        
+        # Remove the program presence legend items
+        fig_scatter.update_traces(showlegend=False, selector=dict(type='scatter', mode='markers'))
+        
+        # Add single OLS trendline for all data (not separate by program)
+        if tmp.shape[0] >= 3:
+            x_vals = tmp["Audiologists_per_100k"].values
+            y_vals = tmp[selected_metric].values
+            # Simple linear regression
+            x_mean = np.mean(x_vals)
+            y_mean = np.mean(y_vals)
+            numerator = np.sum((x_vals - x_mean) * (y_vals - y_mean))
+            denominator = np.sum((x_vals - x_mean) ** 2)
+            if denominator != 0:
+                slope = numerator / denominator
+                intercept = y_mean - slope * x_mean
+                # Generate trendline points
+                x_trend = np.linspace(x_vals.min(), x_vals.max(), 100)
+                y_trend = intercept + slope * x_trend
+                fig_scatter.add_scatter(
+                    x=x_trend,
+                    y=y_trend,
+                    mode='lines',
+                    name='OLS Trendline',
+                    line=dict(color='rgba(68, 1, 84, 0.6)', width=2, dash='dash'),
+                    showlegend=True,
+                )
+        
+        fig_scatter.update_layout(
+            margin=dict(t=10, b=20, l=10, r=10),
+            xaxis_title="Audiologists per 100k Population",
+            yaxis_title=f"{selected_metric} (%)",
+        )
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.plotly_chart(fig_scatter, width='stretch')
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.info(f"No data available for {selected_metric} vs Audiologists per 100k.")
+elif "Audiologists_per_100k" not in cmv_df.columns:
+    st.info("Audiologists per 100k data not available.")
+
 # Statistical Results
 st.markdown("<div class='section-header'>Statistical Analysis (CMV States Only)</div>", unsafe_allow_html=True)
 stats_dict = compute_group_stats(cmv_df, selected_metric)
