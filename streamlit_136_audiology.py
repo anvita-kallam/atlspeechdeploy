@@ -311,7 +311,7 @@ def generate_conclusion(stats_dict: dict, metric: str, include_georgia: bool) ->
 # ===========================
 # Streamlit App
 # ===========================
-st.set_page_config(page_title="Impact of Audiology Program Presence on 1-3-6 Outcomes", layout="wide")
+st.set_page_config(page_title="1-3-6 Outcomes Analysis", layout="wide")
 
 # Ensure no background image is applied
 bg_style = ""
