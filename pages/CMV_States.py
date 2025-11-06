@@ -308,20 +308,10 @@ def compute_group_stats(df: pd.DataFrame, metric: str) -> dict:
 st.set_page_config(page_title="CMV States - 1-3-6 Outcomes", layout="wide")
 
 # Global CSS styling - Nature-inspired theme (same as main app)
-# Load Google Fonts using components
-try:
-    import streamlit.components.v1 as components
-    components.html(
-        '<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">',
-        height=0,
-    )
-except:
-    pass
-
-# CSS Styles
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap');
     :root {
       --green-light: #e8f5e9;
       --green-soft: #a8e6cf;
