@@ -16,7 +16,8 @@ except Exception:
 # ---------------------------
 # Constants and configuration
 # ---------------------------
-WORKSPACE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
+WORKSPACE_DIR = os.path.dirname(WORKSPACE_DIR)  # go up from pages/
 IMPLEMENTATION_FILE = os.path.join(WORKSPACE_DIR, "Economic Model Data - Implementation Data.csv")
 CORRELATION_FILE = os.path.join(WORKSPACE_DIR, "Economic Model Data - Special Education vs. AuD Correlation.csv")
 
@@ -38,6 +39,8 @@ def clean_currency(value):
 @st.cache_data
 def load_implementation_data():
     """Load and clean implementation data."""
+    if not os.path.exists(IMPLEMENTATION_FILE):
+        raise FileNotFoundError(f"CSV not found: {IMPLEMENTATION_FILE}")
     df = pd.read_csv(IMPLEMENTATION_FILE)
     
     # Clean currency values for each year column
@@ -51,6 +54,8 @@ def load_implementation_data():
 @st.cache_data
 def load_correlation_data():
     """Load and clean correlation data."""
+    if not os.path.exists(CORRELATION_FILE):
+        raise FileNotFoundError(f"CSV not found: {CORRELATION_FILE}")
     df = pd.read_csv(CORRELATION_FILE)
     
     # Clean currency columns
