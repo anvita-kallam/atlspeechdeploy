@@ -110,16 +110,16 @@ def create_implementation_cost_chart(df, year_cols):
     
     fig = go.Figure()
     
-    # Bottom layer: OPEX Baseline (Blue)
+    # Bottom layer: OPEX Baseline (Dark Green)
     fig.add_trace(go.Bar(
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color='#1f77b4',  # Blue
+        marker_color='#2d5016',  # Dark green
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Middle layer: Additional Expenses beyond OPEX (Red)
+    # Middle layer: Additional Expenses beyond OPEX (Medium Green)
     # This is Total Annual Expenses - OPEX Baseline
     additional_heights = [total_exp_values[i] - opex_values[i] for i in range(len(years))]
     fig.add_trace(go.Bar(
@@ -127,18 +127,18 @@ def create_implementation_cost_chart(df, year_cols):
         x=years,
         y=additional_heights,
         base=opex_values,
-        marker_color='#d62728',  # Red
+        marker_color='#56ab2f',  # Medium green
         hovertemplate='<b>Total Annual Expenses</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Top layer: CAPEX (Yellow/Orange)
+    # Top layer: CAPEX (Light Green)
     # Base is Total Annual Expenses
     fig.add_trace(go.Bar(
         name='CAPEX',
         x=years,
         y=capex_values,
         base=total_exp_values,
-        marker_color='#ffbb78',  # Yellow/Orange
+        marker_color='#a8e6cf',  # Light green
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -176,15 +176,15 @@ def create_tuition_subsidy_chart(df, year_cols):
             name="Annual Tuition Revenue",
             x=years,
             y=tuition_values,
-            marker_color='#aec7e8',
+            marker_color='#56ab2f',  # Medium green
             hovertemplate='<b>Annual Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=False,
     )
     
     # Add line chart for subsidy/gain
-    # Determine marker colors: red for negative (subsidy), green for positive (gain)
-    marker_colors = ['#d62728' if v < 0 else '#2ca02c' for v in subsidy_values]
+    # Determine marker colors: darker green for negative (subsidy), lighter green for positive (gain)
+    marker_colors = ['#2d5016' if v < 0 else '#a8e6cf' for v in subsidy_values]
     
     fig.add_trace(
         go.Scatter(
@@ -192,7 +192,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=subsidy_values,
             mode='lines+markers',
-            line=dict(color='black', dash='dash', width=2),
+            line=dict(color='#56ab2f', dash='dash', width=2),  # Medium green
             marker=dict(size=10, color=marker_colors),
             hovertemplate='<b>Subsidy/Gain</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
         ),
@@ -203,7 +203,7 @@ def create_tuition_subsidy_chart(df, year_cols):
     fig.add_hline(
         y=0,
         line_dash="solid",
-        line_color="red",
+        line_color="#5a7c3f",  # Muted green
         line_width=2,
         annotation_text="Breakeven Point ($0)",
         annotation_position="right",
@@ -240,15 +240,19 @@ def create_correlation_scatter(df, x_col, y_col, title):
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
     r_squared = r_value ** 2
     
-    # Create scatter plot
+    # Create scatter plot with theme colors
     fig = px.scatter(
         df_clean,
         x=x_col,
         y=y_col,
         title=title,
         labels={x_col: x_col, y_col: y_col},
-        hover_data=['State'] if 'State' in df_clean.columns else None
+        hover_data=['State'] if 'State' in df_clean.columns else None,
+        color_discrete_sequence=['#56ab2f']  # Medium green
     )
+    
+    # Update marker color to theme green
+    fig.update_traces(marker=dict(color='#56ab2f', size=8))
     
     # Add regression line
     x_line = np.linspace(x.min(), x.max(), 100)
@@ -260,7 +264,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
             y=y_line,
             mode='lines',
             name='Regression Line',
-            line=dict(color='red', width=2, dash='dash')
+            line=dict(color='#2d5016', width=2, dash='dash')  # Dark green
         )
     )
     
@@ -422,6 +426,10 @@ st.markdown("<div class='section-header'>Total State Implementation Costs of an 
 fig_impl = create_implementation_cost_chart(impl_df, year_cols)
 st.plotly_chart(fig_impl, use_container_width=True)
 
+# Display implementation data table
+with st.expander("View Implementation Data Table", expanded=False):
+    st.dataframe(impl_df, use_container_width=True)
+
 # Tuition Revenue vs Subsidy/Gain Chart
 st.markdown("<div class='section-header'>Annual Tuition Revenue vs. Subsidy/Gain Over 5 Years</div>", unsafe_allow_html=True)
 fig_tuition = create_tuition_subsidy_chart(impl_df, year_cols)
@@ -443,22 +451,18 @@ with col1:
         )
         if fig_medicaid:
             st.plotly_chart(fig_medicaid, use_container_width=True)
-            st.markdown("<div class='stat-block'>", unsafe_allow_html=True)
             st.write(f"**Statistical Results:**")
             st.write(f"- R-squared: {r2_medicaid:.3f}")
             st.write(f"- Coefficient for Total AuD Program Enrollment: {coef_medicaid:.4f}")
             st.write(f"- P-value for Total AuD Program Enrollment: {p_medicaid:.3f}")
             st.write(f"- Sample size: {n_medicaid}")
-            st.markdown("</div>", unsafe_allow_html=True)
             
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
             st.write("**Key Takeaways:**")
             st.write(f"- The R-squared value of {r2_medicaid:.3f} indicates that {r2_medicaid*100:.1f}% of the variance in Medicaid Spending per Child can be explained by Total AuD Program Enrollment.")
             if r2_medicaid < 0.1:
                 st.write("- This suggests a very weak linear relationship between the two variables.")
             if p_medicaid > 0.05:
                 st.write(f"- The p-value of {p_medicaid:.3f} indicates the relationship is not statistically significant.")
-            st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
     st.markdown("#### Special Education Spending per Child vs. Total AuD Program Enrollment")
@@ -471,20 +475,16 @@ with col2:
         )
         if fig_sped:
             st.plotly_chart(fig_sped, use_container_width=True)
-            st.markdown("<div class='stat-block'>", unsafe_allow_html=True)
             st.write(f"**Statistical Results:**")
             st.write(f"- R-squared: {r2_sped:.3f}")
             st.write(f"- Coefficient for Total AuD Program Enrollment: {coef_sped:.4f}")
             st.write(f"- P-value for Total AuD Program Enrollment: {p_sped:.3f}")
             st.write(f"- Sample size: {n_sped}")
-            st.markdown("</div>", unsafe_allow_html=True)
             
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
             st.write("**Key Takeaways:**")
             st.write(f"- The R-squared value of {r2_sped:.3f} indicates that {r2_sped*100:.1f}% of the variance in Special Education Spending per Child can be explained by Total AuD Program Enrollment.")
             if r2_sped < 0.1:
                 st.write("- This suggests an extremely weak linear relationship between the two variables.")
             if p_sped > 0.05:
                 st.write(f"- The p-value of {p_sped:.3f} indicates no statistically significant relationship.")
-            st.markdown("</div>", unsafe_allow_html=True)
 
