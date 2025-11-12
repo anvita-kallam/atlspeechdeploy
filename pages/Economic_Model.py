@@ -167,7 +167,7 @@ def create_implementation_cost_chart(df, year_cols):
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color='#6a1b9a',  # Purple
+        marker_color='#4a148c',  # Dark purple
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -190,7 +190,7 @@ def create_implementation_cost_chart(df, year_cols):
         x=years,
         y=capex_values,
         base=total_exp_values,
-        marker_color='#ba68c8',  # Light purple
+        marker_color='#5e35b1',  # Dark purple
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -236,7 +236,7 @@ def create_tuition_subsidy_chart(df, year_cols):
     
     # Add line chart for subsidy/gain
     # Determine marker colors: purple for negative (subsidy), green for positive (gain)
-    marker_colors = ['#6a1b9a' if v < 0 else '#56ab2f' for v in subsidy_values]
+    marker_colors = ['#4a148c' if v < 0 else '#56ab2f' for v in subsidy_values]
     
     fig.add_trace(
         go.Scatter(
@@ -244,7 +244,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=subsidy_values,
             mode='lines+markers',
-            line=dict(color='#9c27b0', dash='dash', width=2),  # Purple
+            line=dict(color='#5e35b0', dash='dash', width=2),  # Dark purple
             marker=dict(size=10, color=marker_colors, symbol='circle'),
             hovertemplate='<b>Subsidy/Gain</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
         ),
@@ -258,7 +258,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=[0] * len(years),
             mode='lines',
-            line=dict(color='#7b1fa2', width=2, dash='solid'),  # Purple
+            line=dict(color='#4a148c', width=2, dash='solid'),  # Dark purple
             hovertemplate='<b>Breakeven Point</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
             showlegend=True
         ),
@@ -319,7 +319,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
             y=y_line,
             mode='lines',
             name='Regression Line',
-            line=dict(color='#9c27b0', width=2, dash='dash'),  # Purple
+            line=dict(color='#5e35b0', width=2, dash='dash'),  # Dark purple
             hovertemplate='<b>Regression Line</b><br>%{x:.1f}<br>%{y:,.0f}<extra></extra>'
         )
     )
@@ -609,7 +609,7 @@ try:
                     labels={'# of AuD Programs': '# of AuD Programs', 'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
                 )
                 # Alternate between green and purple for scatter plots
-                fig.update_traces(marker=dict(color='#9c27b0', size=8, opacity=0.7))
+                fig.update_traces(marker=dict(color='#5e35b1', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -627,7 +627,7 @@ try:
                     labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)', 'Unemployment Rate (disabled)': 'Unemployment Rate (Disabled) (%)'}
                 )
                 # Alternate between green and purple for scatter plots
-                fig.update_traces(marker=dict(color='#9c27b0', size=8, opacity=0.7))
+                fig.update_traces(marker=dict(color='#5e35b1', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -664,7 +664,7 @@ try:
                     title='States by Number of AuD Programs',
                     labels={'# of AuD Programs': '# of AuD Programs'}
                 )
-                fig.update_traces(marker_color='#9c27b0')  # Purple
+                fig.update_traces(marker_color='#5e35b1')  # Dark purple
                 fig.update_layout(height=400, xaxis_tickangle=-45)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -681,7 +681,7 @@ try:
                     title='Medicaid Spending per Child by State (Top 15)',
                     labels={'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
                 )
-                fig.update_traces(marker_color='#9c27b0')  # Purple
+                fig.update_traces(marker_color='#5e35b1')  # Dark purple
                 fig.update_layout(height=400, xaxis_tickangle=-45)
                 st.plotly_chart(fig, use_container_width=True)
     
