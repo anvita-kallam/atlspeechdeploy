@@ -172,7 +172,7 @@ with col1:
     # Line chart
     fig_line = go.Figure()
     
-    # Cumulative cash flow line (blue)
+    # Cumulative cash flow line (blue from palette)
     fig_line.add_trace(go.Scatter(
         x=roi_df['Year'],
         y=roi_df['Cumulative Cash Flow'],
@@ -183,13 +183,13 @@ with col1:
         hovertemplate='<b>Cumulative Cash Flow</b><br>Year: %{x}<br>Amount: $%{y:,.2f}<extra></extra>'
     ))
     
-    # Earnings after tax line (purple)
+    # Earnings after tax line (dark purple from palette)
     fig_line.add_trace(go.Scatter(
         x=roi_df['Year'],
         y=roi_df['Earnings After Tax'],
         mode='lines+markers',
         name='Earnings After Tax',
-        line=dict(color='#5e35b1', width=3),
+        line=dict(color='#440154', width=3),
         marker=dict(size=10),
         hovertemplate='<b>Earnings After Tax</b><br>Year: %{x}<br>Amount: $%{y:,.2f}<extra></extra>'
     ))
@@ -219,7 +219,7 @@ with col2:
     # Bar chart
     fig_bar = go.Figure()
     
-    # Revenue bars (green)
+    # Revenue bars (green from palette)
     fig_bar.add_trace(go.Bar(
         x=roi_df['Year'],
         y=roi_df['Revenue'],
@@ -228,7 +228,7 @@ with col2:
         hovertemplate='<b>Revenue</b><br>Year: %{x}<br>Amount: $%{y:,.2f}<extra></extra>'
     ))
     
-    # Total costs bars (pink)
+    # Total costs bars (yellow from palette)
     fig_bar.add_trace(go.Bar(
         x=roi_df['Year'],
         y=roi_df['Total Costs'],
