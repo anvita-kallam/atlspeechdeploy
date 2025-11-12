@@ -162,16 +162,16 @@ def create_implementation_cost_chart(df, year_cols):
     
     fig = go.Figure()
     
-    # Bottom layer: OPEX Baseline (Purple)
+    # Bottom layer: OPEX Baseline (Dark Green)
     fig.add_trace(go.Bar(
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color='#4a148c',  # Dark purple
+        marker_color='#2d5016',  # Dark green
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Middle layer: Additional Expenses beyond OPEX (Green)
+    # Middle layer: Additional Expenses beyond OPEX (Medium Green)
     # This is Total Annual Expenses - OPEX Baseline
     additional_heights = [total_exp_values[i] - opex_values[i] for i in range(len(years))]
     fig.add_trace(go.Bar(
@@ -183,14 +183,14 @@ def create_implementation_cost_chart(df, year_cols):
         hovertemplate='<b>Total Annual Expenses</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Top layer: CAPEX (Light Purple)
+    # Top layer: CAPEX (Light Green)
     # Base is Total Annual Expenses
     fig.add_trace(go.Bar(
         name='CAPEX',
         x=years,
         y=capex_values,
         base=total_exp_values,
-        marker_color='#5e35b1',  # Dark purple
+        marker_color='#a8e6cf',  # Light green
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -222,21 +222,21 @@ def create_tuition_subsidy_chart(df, year_cols):
     # Create subplot with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Add bar chart for tuition revenue (Green)
+    # Add bar chart for tuition revenue
     fig.add_trace(
         go.Bar(
             name="Annual Tuition Revenue",
             x=years,
             y=tuition_values,
-            marker_color='#56ab2f',  # Medium green
+            marker_color='#5ec962',  # Green from palette
             hovertemplate='<b>Annual Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=False,
     )
     
     # Add line chart for subsidy/gain
-    # Determine marker colors: purple for negative (subsidy), green for positive (gain)
-    marker_colors = ['#4a148c' if v < 0 else '#56ab2f' for v in subsidy_values]
+    # Determine marker colors: dark purple for negative (subsidy), green for positive (gain)
+    marker_colors = ['#440154' if v < 0 else '#5ec962' for v in subsidy_values]
     
     fig.add_trace(
         go.Scatter(
@@ -244,7 +244,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=subsidy_values,
             mode='lines+markers',
-            line=dict(color='#5e35b0', dash='dash', width=2),  # Dark purple
+            line=dict(color='#3b528b', dash='dash', width=2),  # Blue from palette
             marker=dict(size=10, color=marker_colors, symbol='circle'),
             hovertemplate='<b>Subsidy/Gain</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
         ),
@@ -258,7 +258,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=[0] * len(years),
             mode='lines',
-            line=dict(color='#4a148c', width=2, dash='solid'),  # Dark purple
+            line=dict(color='#440154', width=2, dash='solid'),  # Dark purple from palette
             hovertemplate='<b>Breakeven Point</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
             showlegend=True
         ),
@@ -295,7 +295,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
     r_squared = r_value ** 2
     
-    # Create scatter plot with green and purple colors
+    # Create scatter plot with new color palette
     fig = px.scatter(
         df_clean,
         x=x_col,
@@ -303,13 +303,13 @@ def create_correlation_scatter(df, x_col, y_col, title):
         title=title,
         labels={x_col: x_col, y_col: y_col},
         hover_data=['State'] if 'State' in df_clean.columns else None,
-        color_discrete_sequence=['#56ab2f']  # Medium green
+        color_discrete_sequence=['#5ec962']  # Green from palette
     )
     
-    # Update marker color (green)
-    fig.update_traces(marker=dict(color='#56ab2f', size=8, opacity=0.7))
+    # Update marker color
+    fig.update_traces(marker=dict(color='#5ec962', size=8, opacity=0.7))
     
-    # Add regression line (purple)
+    # Add regression line
     x_line = np.linspace(x.min(), x.max(), 100)
     y_line = slope * x_line + intercept
     
@@ -319,7 +319,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
             y=y_line,
             mode='lines',
             name='Regression Line',
-            line=dict(color='#5e35b0', width=2, dash='dash'),  # Dark purple
+            line=dict(color='#3b528b', width=2, dash='dash'),  # Blue from palette
             hovertemplate='<b>Regression Line</b><br>%{x:.1f}<br>%{y:,.0f}<extra></extra>'
         )
     )
@@ -608,8 +608,8 @@ try:
                     title='AuD Programs vs. Medicaid Spending per Child',
                     labels={'# of AuD Programs': '# of AuD Programs', 'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
                 )
-                # Alternate between green and purple for scatter plots
-                fig.update_traces(marker=dict(color='#5e35b1', size=8, opacity=0.7))
+                # Use teal from palette for scatter plots
+                fig.update_traces(marker=dict(color='#21918c', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -626,8 +626,8 @@ try:
                     title='Total Enrollment vs. Unemployment Rate (Disabled)',
                     labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)', 'Unemployment Rate (disabled)': 'Unemployment Rate (Disabled) (%)'}
                 )
-                # Alternate between green and purple for scatter plots
-                fig.update_traces(marker=dict(color='#5e35b1', size=8, opacity=0.7))
+                # Use teal from palette for scatter plots
+                fig.update_traces(marker=dict(color='#21918c', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -644,8 +644,8 @@ try:
                 title='Top 15 States by Total Enrollment (4 yr)',
                 labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)'}
             )
-            # Use green for enrollment chart
-            fig.update_traces(marker_color='#56ab2f')
+            # Use green from palette for enrollment chart
+            fig.update_traces(marker_color='#5ec962')
             fig.update_layout(height=400, xaxis_tickangle=-45)
             st.plotly_chart(fig, use_container_width=True)
     
@@ -664,7 +664,8 @@ try:
                     title='States by Number of AuD Programs',
                     labels={'# of AuD Programs': '# of AuD Programs'}
                 )
-                fig.update_traces(marker_color='#5e35b1')  # Dark purple
+                # Use blue from palette for bar charts
+                fig.update_traces(marker_color='#3b528b')
                 fig.update_layout(height=400, xaxis_tickangle=-45)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -681,7 +682,8 @@ try:
                     title='Medicaid Spending per Child by State (Top 15)',
                     labels={'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
                 )
-                fig.update_traces(marker_color='#5e35b1')  # Dark purple
+                # Use blue from palette for bar charts
+                fig.update_traces(marker_color='#3b528b')
                 fig.update_layout(height=400, xaxis_tickangle=-45)
                 st.plotly_chart(fig, use_container_width=True)
     
