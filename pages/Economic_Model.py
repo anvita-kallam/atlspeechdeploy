@@ -162,16 +162,16 @@ def create_implementation_cost_chart(df, year_cols):
     
     fig = go.Figure()
     
-    # Bottom layer: OPEX Baseline (Dark Green)
+    # Bottom layer: OPEX Baseline (Purple)
     fig.add_trace(go.Bar(
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color='#2d5016',  # Dark green
+        marker_color='#6a1b9a',  # Purple
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Middle layer: Additional Expenses beyond OPEX (Medium Green)
+    # Middle layer: Additional Expenses beyond OPEX (Green)
     # This is Total Annual Expenses - OPEX Baseline
     additional_heights = [total_exp_values[i] - opex_values[i] for i in range(len(years))]
     fig.add_trace(go.Bar(
@@ -183,14 +183,14 @@ def create_implementation_cost_chart(df, year_cols):
         hovertemplate='<b>Total Annual Expenses</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Top layer: CAPEX (Light Green)
+    # Top layer: CAPEX (Light Purple)
     # Base is Total Annual Expenses
     fig.add_trace(go.Bar(
         name='CAPEX',
         x=years,
         y=capex_values,
         base=total_exp_values,
-        marker_color='#a8e6cf',  # Light green
+        marker_color='#ba68c8',  # Light purple
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -222,7 +222,7 @@ def create_tuition_subsidy_chart(df, year_cols):
     # Create subplot with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Add bar chart for tuition revenue
+    # Add bar chart for tuition revenue (Green)
     fig.add_trace(
         go.Bar(
             name="Annual Tuition Revenue",
@@ -235,8 +235,8 @@ def create_tuition_subsidy_chart(df, year_cols):
     )
     
     # Add line chart for subsidy/gain
-    # Determine marker colors: darker green for negative (subsidy), lighter green for positive (gain)
-    marker_colors = ['#2d5016' if v < 0 else '#a8e6cf' for v in subsidy_values]
+    # Determine marker colors: purple for negative (subsidy), green for positive (gain)
+    marker_colors = ['#6a1b9a' if v < 0 else '#56ab2f' for v in subsidy_values]
     
     fig.add_trace(
         go.Scatter(
@@ -244,7 +244,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=subsidy_values,
             mode='lines+markers',
-            line=dict(color='#56ab2f', dash='dash', width=2),  # Medium green
+            line=dict(color='#9c27b0', dash='dash', width=2),  # Purple
             marker=dict(size=10, color=marker_colors, symbol='circle'),
             hovertemplate='<b>Subsidy/Gain</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
         ),
@@ -258,7 +258,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=[0] * len(years),
             mode='lines',
-            line=dict(color='#5a7c3f', width=2, dash='solid'),  # Muted green
+            line=dict(color='#7b1fa2', width=2, dash='solid'),  # Purple
             hovertemplate='<b>Breakeven Point</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
             showlegend=True
         ),
@@ -295,7 +295,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
     r_squared = r_value ** 2
     
-    # Create scatter plot with theme colors
+    # Create scatter plot with green and purple colors
     fig = px.scatter(
         df_clean,
         x=x_col,
@@ -306,10 +306,10 @@ def create_correlation_scatter(df, x_col, y_col, title):
         color_discrete_sequence=['#56ab2f']  # Medium green
     )
     
-    # Update marker color
+    # Update marker color (green)
     fig.update_traces(marker=dict(color='#56ab2f', size=8, opacity=0.7))
     
-    # Add regression line
+    # Add regression line (purple)
     x_line = np.linspace(x.min(), x.max(), 100)
     y_line = slope * x_line + intercept
     
@@ -319,7 +319,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
             y=y_line,
             mode='lines',
             name='Regression Line',
-            line=dict(color='#2d5016', width=2, dash='dash'),  # Dark green
+            line=dict(color='#9c27b0', width=2, dash='dash'),  # Purple
             hovertemplate='<b>Regression Line</b><br>%{x:.1f}<br>%{y:,.0f}<extra></extra>'
         )
     )
@@ -608,7 +608,8 @@ try:
                     title='AuD Programs vs. Medicaid Spending per Child',
                     labels={'# of AuD Programs': '# of AuD Programs', 'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
                 )
-                fig.update_traces(marker=dict(color='#56ab2f', size=8, opacity=0.7))
+                # Alternate between green and purple for scatter plots
+                fig.update_traces(marker=dict(color='#9c27b0', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -625,7 +626,8 @@ try:
                     title='Total Enrollment vs. Unemployment Rate (Disabled)',
                     labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)', 'Unemployment Rate (disabled)': 'Unemployment Rate (Disabled) (%)'}
                 )
-                fig.update_traces(marker=dict(color='#56ab2f', size=8, opacity=0.7))
+                # Alternate between green and purple for scatter plots
+                fig.update_traces(marker=dict(color='#9c27b0', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -642,6 +644,7 @@ try:
                 title='Top 15 States by Total Enrollment (4 yr)',
                 labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)'}
             )
+            # Use green for enrollment chart
             fig.update_traces(marker_color='#56ab2f')
             fig.update_layout(height=400, xaxis_tickangle=-45)
             st.plotly_chart(fig, use_container_width=True)
@@ -661,19 +664,8 @@ try:
                     title='States by Number of AuD Programs',
                     labels={'# of AuD Programs': '# of AuD Programs'}
                 )
-                fig.update_traces(
-                    marker_color='#56ab2f',
-                    marker_line=dict(color='#2d5016', width=2),
-                    opacity=0.9
-                )
-                fig.update_layout(
-                    height=400,
-                    xaxis_tickangle=-45,
-                    xaxis=dict(gridcolor='rgba(86, 171, 47, 0.1)', gridwidth=1, showgrid=True),
-                    yaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
-                    plot_bgcolor='rgba(232, 245, 233, 0.3)',
-                    paper_bgcolor='white'
-                )
+                fig.update_traces(marker_color='#9c27b0')  # Purple
+                fig.update_layout(height=400, xaxis_tickangle=-45)
                 st.plotly_chart(fig, use_container_width=True)
     
     with col4:
@@ -689,19 +681,8 @@ try:
                     title='Medicaid Spending per Child by State (Top 15)',
                     labels={'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
                 )
-                fig.update_traces(
-                    marker_color='#56ab2f',
-                    marker_line=dict(color='#2d5016', width=2),
-                    opacity=0.9
-                )
-                fig.update_layout(
-                    height=400,
-                    xaxis_tickangle=-45,
-                    xaxis=dict(gridcolor='rgba(86, 171, 47, 0.1)', gridwidth=1, showgrid=True),
-                    yaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
-                    plot_bgcolor='rgba(232, 245, 233, 0.3)',
-                    paper_bgcolor='white'
-                )
+                fig.update_traces(marker_color='#9c27b0')  # Purple
+                fig.update_layout(height=400, xaxis_tickangle=-45)
                 st.plotly_chart(fig, use_container_width=True)
     
     # Full data table dropdown
