@@ -199,15 +199,18 @@ def create_tuition_subsidy_chart(df, year_cols):
         secondary_y=True,
     )
     
-    # Add breakeven line at $0
-    fig.add_hline(
-        y=0,
-        line_dash="solid",
-        line_color="#5a7c3f",  # Muted green
-        line_width=2,
-        annotation_text="Breakeven Point ($0)",
-        annotation_position="right",
-        secondary_y=True
+    # Add breakeven line at $0 as a trace so it appears in the legend
+    fig.add_trace(
+        go.Scatter(
+            name="Breakeven Point ($0)",
+            x=years,
+            y=[0] * len(years),
+            mode='lines',
+            line=dict(color='#5a7c3f', width=2, dash='solid'),  # Muted green
+            hovertemplate='<b>Breakeven Point</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
+            showlegend=True
+        ),
+        secondary_y=True,
     )
     
     # Set axis labels
