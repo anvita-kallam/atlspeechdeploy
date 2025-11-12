@@ -249,12 +249,12 @@ with col2:
     
     st.plotly_chart(fig_bar, use_container_width=True)
 
-# Display full data table
-st.markdown("<div class='section-header'>Financial Data Table</div>", unsafe_allow_html=True)
-st.dataframe(roi_df, use_container_width=True)
+# Display full data table in dropdown
+with st.expander("Financial Data Table", expanded=False):
+    st.dataframe(roi_df, use_container_width=True)
 
 # Format the table with color coding for negative values
-st.markdown("#### Formatted Financial Summary")
+st.markdown("#### Financial Summary")
 formatted_df = roi_df.copy()
 
 # Format currency columns
