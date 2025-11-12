@@ -488,3 +488,8 @@ with col2:
             if p_sped > 0.05:
                 st.write(f"- The p-value of {p_sped:.3f} indicates no statistically significant relationship.")
 
+# Display correlation data table
+st.markdown("<div class='section-header'>Correlation Data</div>", unsafe_allow_html=True)
+with st.expander("View Correlation Data Table", expanded=False):
+    st.dataframe(corr_df, use_container_width=True)
+
