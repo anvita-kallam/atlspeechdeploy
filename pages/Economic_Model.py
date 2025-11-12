@@ -162,19 +162,16 @@ def create_implementation_cost_chart(df, year_cols):
     
     fig = go.Figure()
     
-    # Use viridis colors
-    viridis_colors = px.colors.sequential.Viridis
-    
-    # Bottom layer: OPEX Baseline
+    # Bottom layer: OPEX Baseline (Dark Green)
     fig.add_trace(go.Bar(
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color=viridis_colors[0],
+        marker_color='#2d5016',  # Dark green
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Middle layer: Additional Expenses beyond OPEX
+    # Middle layer: Additional Expenses beyond OPEX (Medium Green)
     # This is Total Annual Expenses - OPEX Baseline
     additional_heights = [total_exp_values[i] - opex_values[i] for i in range(len(years))]
     fig.add_trace(go.Bar(
@@ -182,18 +179,18 @@ def create_implementation_cost_chart(df, year_cols):
         x=years,
         y=additional_heights,
         base=opex_values,
-        marker_color=viridis_colors[2],
+        marker_color='#56ab2f',  # Medium green
         hovertemplate='<b>Total Annual Expenses</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Top layer: CAPEX
+    # Top layer: CAPEX (Light Green)
     # Base is Total Annual Expenses
     fig.add_trace(go.Bar(
         name='CAPEX',
         x=years,
         y=capex_values,
         base=total_exp_values,
-        marker_color=viridis_colors[4],
+        marker_color='#a8e6cf',  # Light green
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -225,24 +222,21 @@ def create_tuition_subsidy_chart(df, year_cols):
     # Create subplot with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Use viridis colors
-    viridis_colors = px.colors.sequential.Viridis
-    
     # Add bar chart for tuition revenue
     fig.add_trace(
         go.Bar(
             name="Annual Tuition Revenue",
             x=years,
             y=tuition_values,
-            marker_color=viridis_colors[3],
+            marker_color='#56ab2f',  # Medium green
             hovertemplate='<b>Annual Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=False,
     )
     
     # Add line chart for subsidy/gain
-    # Use viridis colors: darker for negative (subsidy), lighter for positive (gain)
-    marker_colors = [viridis_colors[0] if v < 0 else viridis_colors[4] for v in subsidy_values]
+    # Determine marker colors: darker green for negative (subsidy), lighter green for positive (gain)
+    marker_colors = ['#2d5016' if v < 0 else '#a8e6cf' for v in subsidy_values]
     
     fig.add_trace(
         go.Scatter(
@@ -250,7 +244,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=subsidy_values,
             mode='lines+markers',
-            line=dict(color=viridis_colors[2], dash='dash', width=2),
+            line=dict(color='#56ab2f', dash='dash', width=2),  # Medium green
             marker=dict(size=10, color=marker_colors, symbol='circle'),
             hovertemplate='<b>Subsidy/Gain</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
         ),
@@ -264,7 +258,7 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=[0] * len(years),
             mode='lines',
-            line=dict(color='black', width=2, dash='solid'),
+            line=dict(color='#5a7c3f', width=2, dash='solid'),  # Muted green
             hovertemplate='<b>Breakeven Point</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
             showlegend=True
         ),
@@ -301,8 +295,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
     r_squared = r_value ** 2
     
-    # Create scatter plot with viridis colors
-    viridis_colors = px.colors.sequential.Viridis
+    # Create scatter plot with theme colors
     fig = px.scatter(
         df_clean,
         x=x_col,
@@ -310,11 +303,11 @@ def create_correlation_scatter(df, x_col, y_col, title):
         title=title,
         labels={x_col: x_col, y_col: y_col},
         hover_data=['State'] if 'State' in df_clean.columns else None,
-        color_discrete_sequence=[viridis_colors[3]]
+        color_discrete_sequence=['#56ab2f']  # Medium green
     )
     
     # Update marker color
-    fig.update_traces(marker=dict(size=8, opacity=0.7))
+    fig.update_traces(marker=dict(color='#56ab2f', size=8, opacity=0.7))
     
     # Add regression line
     x_line = np.linspace(x.min(), x.max(), 100)
@@ -326,7 +319,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
             y=y_line,
             mode='lines',
             name='Regression Line',
-            line=dict(color=viridis_colors[5], width=2, dash='dash'),
+            line=dict(color='#2d5016', width=2, dash='dash'),  # Dark green
             hovertemplate='<b>Regression Line</b><br>%{x:.1f}<br>%{y:,.0f}<extra></extra>'
         )
     )
@@ -615,8 +608,7 @@ try:
                     title='AuD Programs vs. Medicaid Spending per Child',
                     labels={'# of AuD Programs': '# of AuD Programs', 'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
                 )
-                viridis_colors = px.colors.sequential.Viridis
-                fig.update_traces(marker=dict(color=viridis_colors[3], size=8, opacity=0.7))
+                fig.update_traces(marker=dict(color='#56ab2f', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -633,8 +625,7 @@ try:
                     title='Total Enrollment vs. Unemployment Rate (Disabled)',
                     labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)', 'Unemployment Rate (disabled)': 'Unemployment Rate (Disabled) (%)'}
                 )
-                viridis_colors = px.colors.sequential.Viridis
-                fig.update_traces(marker=dict(color=viridis_colors[3], size=8, opacity=0.7))
+                fig.update_traces(marker=dict(color='#56ab2f', size=8, opacity=0.7))
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
     
@@ -651,8 +642,7 @@ try:
                 title='Top 15 States by Total Enrollment (4 yr)',
                 labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)'}
             )
-            viridis_colors = px.colors.sequential.Viridis
-            fig.update_traces(marker_color=viridis_colors[3])
+            fig.update_traces(marker_color='#56ab2f')
             fig.update_layout(height=400, xaxis_tickangle=-45)
             st.plotly_chart(fig, use_container_width=True)
     
