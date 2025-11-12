@@ -1,0 +1,61 @@
+State,# of AuD Programs,Medicaid Spending per Child,Unemployment Rate (general),Unemployment Rate (disabled),State Revenue impacts (if available) -  Total medicaid spending (in millions),Avg. special education spending (per child per state),Programs,Total Capacity (4 yr),Total Enrollment (4 yr),How I calculated it
+Alabama,2,"$2,680",2.9,39%,"$1,857","$13,996",2,100,86.4,Methodology
+Alaska,0,"$5,911",4.7,52%,626,"$35,486",0,0,0,
+American Samoa,0,,,,8,,0,0,0,The number of Doctor of Audiology (Au.D.) programs per state was established using the lists of currently accredited programs from the American Academy of Audiology (audiology.org) and the Academy of Doctors of Audiology (audiologist.org). These sources reflect the state-by-state program counts in the United States as of 2025.
+Arizona,1,"$4,005",4.1,49%,"4,397","$32,227",3,150,129.6,
+Arkansas,1,"$3,343",3.8,41%,"1,827","$13,586",1,50,43.2,Using the total national first-year capacity of 998 seats from the American Speech‑Language‑Hearing Association (ASHA) Education Survey (2023–2024) (https://www.asha.org/siteassets/surveys/csd-education-survey-national-aggregate-data-report.pdf
+California,5,"$3,419",5.5,46%,"45,178","$34,530",6,300,259.6,"), and the reported mean first-year capacity per program (13 seats), the following steps were used:"
+Colorado,2,"$3,387",4.2,58%,"5,014","$35,167",2,100,86.4,
+Connecticut,1,"$3,763",3.8,50%,"3,926","$32,812",1,50,43.2,Each state’s program count × 13 seats = estimated state first-year capacity.
+Delaware,0,"$5,242",4.3,53%,982,"$34,058",0,0,0,
+District of Columbia,1,"$5,145",6,55%,971,"$44,913",0,0,0,Capacity multiplied by 4 years = estimated total capacity across all cohorts per state.
+Florida,3,"$3,510",3.8,44%,"12,145","$17,891",3,150,129.6,
+Georgia,0,"$2,747",3.4,46%,"4,825","$14,080",0,0,0,Applying the national fill-rate (863 enrollments / 998 seats ≈ 86.5%) to the total capacity gives the estimated total enrollment over four years per state.
+Guam,0,,,,23,,0,0,0,
+Hawaii,0,"$3,394",2.7,47%,841,"$26,735",0,0,0,Sources:
+Idaho,1,"$2,970",3.7,53%,760,"$25,035",1,50,43.2,
+Illinois,5,"$3,370",4.4,49%,"11,617","$19,790",5,250,216.4,American Academy of Audiology — Program list by state (audiology.org)
+Indiana,3,"$3,329",3.6,45%,"4,457","$19,130",3,150,129.6,
+Iowa,1,"$3,431",3.8,55%,"1,911","$28,632",1,50,43.2,Academy of Doctors of Audiology — Program list (audiologist.org)
+Kansas,2,"$3,943",3.8,54%,"1,915","$26,654",2,100,86.4,
+Kentucky,1,"$4,593",4.7,40%,"3,105","$19,850",1,50,43.2,ASHA CSD Education Survey National Aggregate Data Report (2023-2024)
+Louisiana,2,"$3,999",4.4,39%,"3,473","$17,658",2,100,86.4,
+Maine,0,"$4,144",3.2,46%,"1,201","$27,671",0,0,0,
+Marshall Islands,0,,,,,,0,0,0,
+Maryland,2,"$3,898",3.6,49%,"6,404","$33,068",2,100,86.4,
+Massachusetts,2,"$4,118",4.8,47%,"9,637","$21,881",2,100,86.4,
+Michigan,4,"$2,884",5.2,42%,"5,783","$19,063",4,200,172.8,
+Micronesia,0,,,,,,0,0,0,
+Minnesota,1,"$4,182",3.6,56%,"6,991","$53,311",1,50,43.2,
+Mississippi,2,"$3,261",3.9,41%,"1,176","$15,152",2,100,86.4,
+Missouri,2,"$4,682",4.1,46%,"3,599","$26,147",2,100,86.4,
+Montana,0,"$4,471",2.9,55%,502,"$22,564",0,0,0,
+Nebraska,1,"$3,777",3,59%,"1,202","$27,928",1,50,43.2,
+Nevada,0,"$2,586",5.3,50%,"1,350","$17,626",0,0,0,
+New Hampshire,0,"$4,843",3,51%,994,"$25,639",0,0,0,
+New Jersey,1,"$3,741",5,49%,"8,407","$35,874",1,50,43.2,
+New Mexico,0,"$4,930",4.1,43%,"1,514","$28,097",0,0,0,
+New York,4,"$3,727",4,41%,"34,456","$37,701",4,200,172.8,
+North Carolina,2,"$3,589",3.7,45%,"5,673","$22,312",2,100,86.4,
+North Dakota,0,"$4,003",2.5,53%,545,"$35,311",0,0,0,
+Northern Marianas,0,,,,10,,0,0,0,
+Ohio,4,"$4,020",5,47%,"8,691","$22,086",4,200,172.8,
+Oklahoma,1,"$4,320",3.1,47%,"1,659","$18,821",1,50,43.2,
+Oregon,1,"$5,199",5,49%,"3,862","$21,453",1,50,43.2,
+Palau,0,,,,,,0,0,0,
+Pennsylvania,3,"$4,695",4,45%,"16,419","$27,330",3,150,129.6,
+Puerto Rico,1,"$1,690",4.6,33%,569,$956,0,0,0,
+Rhode Island,0,"$3,904",4.6,48%,"1,250","$18,040",0,0,0,
+South Carolina,0,"$2,888",4.3,44%,"2,233","$17,311",0,0,0,
+South Dakota,1,"$3,716",1.9,62%,403,"$28,794",1,50,43.2,
+Tennessee,4,"$3,839",3.6,44%,"3,901","$16,430",4,200,172.8,
+Texas,5,"$5,332",4.1,52%,"20,348","$29,273",5,250,216.4,
+Utah,2,"$2,087",3.3,58%,"1,180","$14,176",2,100,86.4,
+Vermont,0,"$4,232",2.5,48%,750,"$29,617",0,0,0,
+Virgin Islands,0,"$5,843",,,22,"$24,719",0,0,0,
+Virginia,1,"$3,829",3.6,49%,"7,218","$35,527",1,50,43.2,
+Washington,1,"$3,822",4.5,51%,"6,651","$35,101",1,50,43.2,
+West Virginia,1,"$3,518",3.8,36%,"1,048","$16,022",1,50,43.2,
+Wisconsin,1,"$3,020",3.1,51%,"4,375","$23,129",1,50,43.2,
+Wyoming,0,"$3,821",3.2,52%,313,"$26,794",0,0,0,
+,,,,,,,80,"3,992.00","3,455.20",
