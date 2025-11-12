@@ -149,7 +149,20 @@ def create_implementation_cost_chart(df, year_cols):
         barmode='stack',
         height=500,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        yaxis=dict(range=[0, 2000000], tickformat='$,.0f')
+        yaxis=dict(
+            range=[0, 2000000], 
+            tickformat='$,.0f',
+            gridcolor='rgba(86, 171, 47, 0.2)',
+            gridwidth=1,
+            showgrid=True
+        ),
+        xaxis=dict(
+            gridcolor='rgba(86, 171, 47, 0.1)',
+            gridwidth=1,
+            showgrid=True
+        ),
+        plot_bgcolor='rgba(232, 245, 233, 0.3)',
+        paper_bgcolor='white'
     )
     
     return fig
@@ -170,14 +183,16 @@ def create_tuition_subsidy_chart(df, year_cols):
     # Create subplot with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Add bar chart for tuition revenue
+    # Add bar chart for tuition revenue with better contrast
     fig.add_trace(
         go.Bar(
             name="Annual Tuition Revenue",
             x=years,
             y=tuition_values,
             marker_color='#56ab2f',  # Medium green
-            hovertemplate='<b>Annual Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>'
+            marker_line=dict(color='#2d5016', width=2),  # Dark green border for contrast
+            hovertemplate='<b>Annual Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>',
+            opacity=0.9
         ),
         secondary_y=False,
     )
@@ -192,8 +207,13 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=subsidy_values,
             mode='lines+markers',
-            line=dict(color='#56ab2f', dash='dash', width=2),  # Medium green
-            marker=dict(size=10, color=marker_colors),
+            line=dict(color='#56ab2f', dash='dash', width=3),  # Medium green, thicker line
+            marker=dict(
+                size=14, 
+                color=marker_colors,
+                line=dict(color='#2d5016', width=2),  # Dark border for contrast
+                symbol='circle'
+            ),
             hovertemplate='<b>Subsidy/Gain</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=True,
@@ -206,23 +226,46 @@ def create_tuition_subsidy_chart(df, year_cols):
             x=years,
             y=[0] * len(years),
             mode='lines',
-            line=dict(color='#5a7c3f', width=2, dash='solid'),  # Muted green
+            line=dict(color='#2d5016', width=3, dash='solid'),  # Dark green, thicker for visibility
             hovertemplate='<b>Breakeven Point</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
             showlegend=True
         ),
         secondary_y=True,
     )
     
-    # Set axis labels
-    fig.update_xaxes(title_text="Year")
-    fig.update_yaxes(title_text="Annual Tuition Revenue ($)", secondary_y=False, tickformat='$,.0f', range=[0, 1000000])
-    fig.update_yaxes(title_text="Annual Subsidy Required / (Gain) ($)", secondary_y=True, tickformat='$,.0f', range=[-700000, 100000])
+    # Set axis labels with better styling
+    fig.update_xaxes(
+        title_text="Year",
+        gridcolor='rgba(86, 171, 47, 0.1)',
+        gridwidth=1,
+        showgrid=True
+    )
+    fig.update_yaxes(
+        title_text="Annual Tuition Revenue ($)", 
+        secondary_y=False, 
+        tickformat='$,.0f', 
+        range=[0, 1000000],
+        gridcolor='rgba(86, 171, 47, 0.2)',
+        gridwidth=1,
+        showgrid=True
+    )
+    fig.update_yaxes(
+        title_text="Annual Subsidy Required / (Gain) ($)", 
+        secondary_y=True, 
+        tickformat='$,.0f', 
+        range=[-700000, 100000],
+        gridcolor='rgba(86, 171, 47, 0.2)',
+        gridwidth=1,
+        showgrid=True
+    )
     
     fig.update_layout(
         title="Annual Tuition Revenue vs. Subsidy/Gain Over 5 Years",
         height=500,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode='x unified'
+        hovermode='x unified',
+        plot_bgcolor='rgba(232, 245, 233, 0.3)',
+        paper_bgcolor='white'
     )
     
     return fig
@@ -243,7 +286,7 @@ def create_correlation_scatter(df, x_col, y_col, title):
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
     r_squared = r_value ** 2
     
-    # Create scatter plot with theme colors
+    # Create scatter plot with theme colors and better contrast
     fig = px.scatter(
         df_clean,
         x=x_col,
@@ -254,10 +297,17 @@ def create_correlation_scatter(df, x_col, y_col, title):
         color_discrete_sequence=['#56ab2f']  # Medium green
     )
     
-    # Update marker color to theme green
-    fig.update_traces(marker=dict(color='#56ab2f', size=8))
+    # Update marker color to theme green with better contrast
+    fig.update_traces(
+        marker=dict(
+            color='#56ab2f', 
+            size=12,  # Larger markers
+            line=dict(color='#2d5016', width=2),  # Dark green border for contrast
+            opacity=0.8
+        )
+    )
     
-    # Add regression line
+    # Add regression line with better visibility
     x_line = np.linspace(x.min(), x.max(), 100)
     y_line = slope * x_line + intercept
     
@@ -267,7 +317,8 @@ def create_correlation_scatter(df, x_col, y_col, title):
             y=y_line,
             mode='lines',
             name='Regression Line',
-            line=dict(color='#2d5016', width=2, dash='dash')  # Dark green
+            line=dict(color='#2d5016', width=3, dash='dash'),  # Dark green, thicker
+            hovertemplate='<b>Regression Line</b><br>%{x:.1f}<br>%{y:,.0f}<extra></extra>'
         )
     )
     
@@ -275,7 +326,19 @@ def create_correlation_scatter(df, x_col, y_col, title):
         height=500,
         showlegend=True,
         xaxis_title=x_col,
-        yaxis_title=y_col
+        yaxis_title=y_col,
+        xaxis=dict(
+            gridcolor='rgba(86, 171, 47, 0.2)',
+            gridwidth=1,
+            showgrid=True
+        ),
+        yaxis=dict(
+            gridcolor='rgba(86, 171, 47, 0.2)',
+            gridwidth=1,
+            showgrid=True
+        ),
+        plot_bgcolor='rgba(232, 245, 233, 0.3)',
+        paper_bgcolor='white'
     )
     
     return fig, r_squared, slope, p_value, len(df_clean)
