@@ -544,9 +544,46 @@ st.markdown("<div class='section-header'>Total State Implementation Costs of an 
 fig_impl = create_implementation_cost_chart(impl_df, year_cols)
 st.plotly_chart(fig_impl, use_container_width=True)
 
-# Display implementation data table
+# Display implementation data table with color formatting
 with st.expander("View Implementation Data Table", expanded=False):
-    st.dataframe(impl_df, use_container_width=True)
+    # Create a display version with formatted values
+    display_df = impl_df.copy()
+    
+    # Find the subsidy row
+    subsidy_mask = display_df['Metric'] == 'Annual Subsidy Required / (Operational Surplus)'
+    if subsidy_mask.any():
+        # Get year columns
+        year_cols = [col for col in display_df.columns if 'Year' in col]
+        
+        # Format the subsidy values with colors
+        for col in year_cols:
+            if col in display_df.columns:
+                val = display_df.loc[subsidy_mask, col].values[0]
+                if pd.notna(val):
+                    # Values are already cleaned to float in impl_df
+                    try:
+                        num_val = float(val)
+                        # Format with HTML colors
+                        if num_val < 0:
+                            display_df.loc[subsidy_mask, col] = f'<span style="color: #d62728; font-weight: bold;">${num_val:,.0f}</span>'
+                        elif num_val > 0:
+                            display_df.loc[subsidy_mask, col] = f'<span style="color: #2ca02c; font-weight: bold;">${num_val:,.0f}</span>'
+                        else:
+                            display_df.loc[subsidy_mask, col] = f'${num_val:,.0f}'
+                    except:
+                        pass
+    
+    # Format other numeric columns for display
+    for col in year_cols:
+        if col in display_df.columns:
+            for idx in display_df.index:
+                if not subsidy_mask.loc[idx]:  # Only format non-subsidy rows
+                    val = display_df.loc[idx, col]
+                    if pd.notna(val) and isinstance(val, (int, float)):
+                        display_df.loc[idx, col] = f'${val:,.0f}'
+    
+    # Display with HTML rendering
+    st.markdown(display_df.to_html(escape=False, index=False, classes='dataframe'), unsafe_allow_html=True)
 
 # Tuition Revenue vs Subsidy/Gain Chart
 st.markdown("<div class='section-header'>Annual Tuition Revenue vs. Subsidy/Gain Over 5 Years</div>", unsafe_allow_html=True)
