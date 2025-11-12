@@ -20,6 +20,7 @@ WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE_DIR = os.path.dirname(WORKSPACE_DIR)  # go up from pages/
 IMPLEMENTATION_FILE = os.path.join(WORKSPACE_DIR, "Economic Model Data - Implementation Data.csv")
 CORRELATION_FILE = os.path.join(WORKSPACE_DIR, "Economic Model Data - Special Education vs. AuD Correlation.csv")
+LONGTERM_FILE = os.path.join(WORKSPACE_DIR, "Economic Model Data - Long-Term Economic Data.csv")
 
 
 def clean_currency(value):
@@ -30,6 +31,20 @@ def clean_currency(value):
         return float(value)
     # Remove $, commas, and parentheses (for negative values)
     cleaned = str(value).replace('$', '').replace(',', '').replace('(', '-').replace(')', '').strip()
+    try:
+        return float(cleaned)
+    except:
+        return np.nan
+
+
+def clean_percentage(value):
+    """Convert percentage string to float."""
+    if pd.isna(value) or value == '':
+        return np.nan
+    if isinstance(value, (int, float)):
+        return float(value)
+    # Remove % sign
+    cleaned = str(value).replace('%', '').strip()
     try:
         return float(cleaned)
     except:
@@ -72,6 +87,43 @@ def load_correlation_data():
     df_clean = df.dropna(subset=['Total AuD Program Enrollment', 'Sp Ed Spending per Child', 'Medicaid Spending per Child'])
     
     return df, df_clean
+
+
+@st.cache_data
+def load_longterm_data():
+    """Load and clean long-term economic data."""
+    if not os.path.exists(LONGTERM_FILE):
+        raise FileNotFoundError(f"CSV not found: {LONGTERM_FILE}")
+    df = pd.read_csv(LONGTERM_FILE)
+    
+    # Remove the last row if it's a summary row (contains methodology text)
+    if 'How I calculated it' in df.columns:
+        df = df[~df['How I calculated it'].astype(str).str.contains('Methodology|Sources|ASHA|Academy', case=False, na=False)]
+    
+    # Clean currency columns
+    if 'Medicaid Spending per Child' in df.columns:
+        df['Medicaid Spending per Child'] = df['Medicaid Spending per Child'].apply(clean_currency)
+    if 'Avg. special education spending (per child per state)' in df.columns:
+        df['Avg. special education spending (per child per state)'] = df['Avg. special education spending (per child per state)'].apply(clean_currency)
+    if 'State Revenue impacts (if available) -  Total medicaid spending (in millions)' in df.columns:
+        df['State Revenue impacts (if available) -  Total medicaid spending (in millions)'] = df['State Revenue impacts (if available) -  Total medicaid spending (in millions)'].apply(clean_currency)
+    
+    # Clean percentage columns
+    if 'Unemployment Rate (general)' in df.columns:
+        df['Unemployment Rate (general)'] = pd.to_numeric(df['Unemployment Rate (general)'], errors='coerce')
+    if 'Unemployment Rate (disabled)' in df.columns:
+        df['Unemployment Rate (disabled)'] = df['Unemployment Rate (disabled)'].apply(clean_percentage)
+    
+    # Ensure numeric columns are numeric
+    numeric_cols = ['# of AuD Programs', 'Programs', 'Total Capacity (4 yr)', 'Total Enrollment (4 yr)']
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+    
+    # Remove rows where State is missing
+    df = df[df['State'].notna()]
+    
+    return df
 
 
 def create_implementation_cost_chart(df, year_cols):
@@ -558,4 +610,167 @@ with col2:
 st.markdown("<div class='section-header'>Correlation Data</div>", unsafe_allow_html=True)
 with st.expander("View Correlation Data Table", expanded=False):
     st.dataframe(corr_df, use_container_width=True)
+
+# Long-Term Economic Data Section
+st.markdown("<div class='section-header'>Long-Term Economic Analysis</div>", unsafe_allow_html=True)
+
+try:
+    longterm_df = load_longterm_data()
+    
+    # Create visualizations
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### AuD Programs vs. Medicaid Spending per Child")
+        if '# of AuD Programs' in longterm_df.columns and 'Medicaid Spending per Child' in longterm_df.columns:
+            df_clean = longterm_df.dropna(subset=['# of AuD Programs', 'Medicaid Spending per Child'])
+            if not df_clean.empty:
+                fig = px.scatter(
+                    df_clean,
+                    x='# of AuD Programs',
+                    y='Medicaid Spending per Child',
+                    hover_data=['State'],
+                    title='AuD Programs vs. Medicaid Spending per Child',
+                    labels={'# of AuD Programs': '# of AuD Programs', 'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
+                )
+                fig.update_traces(
+                    marker=dict(
+                        color='#56ab2f',
+                        size=12,
+                        line=dict(color='#2d5016', width=2),
+                        opacity=0.8
+                    )
+                )
+                fig.update_layout(
+                    height=400,
+                    xaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
+                    yaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
+                    plot_bgcolor='rgba(232, 245, 233, 0.3)',
+                    paper_bgcolor='white'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.markdown("#### Total Enrollment vs. Unemployment Rate (Disabled)")
+        if 'Total Enrollment (4 yr)' in longterm_df.columns and 'Unemployment Rate (disabled)' in longterm_df.columns:
+            df_clean = longterm_df.dropna(subset=['Total Enrollment (4 yr)', 'Unemployment Rate (disabled)'])
+            if not df_clean.empty:
+                fig = px.scatter(
+                    df_clean,
+                    x='Total Enrollment (4 yr)',
+                    y='Unemployment Rate (disabled)',
+                    hover_data=['State'],
+                    title='Total Enrollment vs. Unemployment Rate (Disabled)',
+                    labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)', 'Unemployment Rate (disabled)': 'Unemployment Rate (Disabled) (%)'}
+                )
+                fig.update_traces(
+                    marker=dict(
+                        color='#56ab2f',
+                        size=12,
+                        line=dict(color='#2d5016', width=2),
+                        opacity=0.8
+                    )
+                )
+                fig.update_layout(
+                    height=400,
+                    xaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
+                    yaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
+                    plot_bgcolor='rgba(232, 245, 233, 0.3)',
+                    paper_bgcolor='white'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+    
+    # Bar chart: Top states by enrollment
+    st.markdown("#### Top 15 States by Total Enrollment (4 yr)")
+    if 'Total Enrollment (4 yr)' in longterm_df.columns:
+        df_enrollment = longterm_df.dropna(subset=['Total Enrollment (4 yr)', 'State'])
+        df_enrollment = df_enrollment.sort_values('Total Enrollment (4 yr)', ascending=False).head(15)
+        if not df_enrollment.empty:
+            fig = px.bar(
+                df_enrollment,
+                x='State',
+                y='Total Enrollment (4 yr)',
+                title='Top 15 States by Total Enrollment (4 yr)',
+                labels={'Total Enrollment (4 yr)': 'Total Enrollment (4 yr)'}
+            )
+            fig.update_traces(
+                marker_color='#56ab2f',
+                marker_line=dict(color='#2d5016', width=2),
+                opacity=0.9
+            )
+            fig.update_layout(
+                height=400,
+                xaxis_tickangle=-45,
+                xaxis=dict(gridcolor='rgba(86, 171, 47, 0.1)', gridwidth=1, showgrid=True),
+                yaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
+                plot_bgcolor='rgba(232, 245, 233, 0.3)',
+                paper_bgcolor='white'
+            )
+            st.plotly_chart(fig, use_container_width=True)
+    
+    # Bar chart: States by number of programs
+    col3, col4 = st.columns(2)
+    with col3:
+        st.markdown("#### States by Number of AuD Programs")
+        if '# of AuD Programs' in longterm_df.columns:
+            df_programs = longterm_df.dropna(subset=['# of AuD Programs', 'State'])
+            df_programs = df_programs[df_programs['# of AuD Programs'] > 0].sort_values('# of AuD Programs', ascending=False)
+            if not df_programs.empty:
+                fig = px.bar(
+                    df_programs,
+                    x='State',
+                    y='# of AuD Programs',
+                    title='States by Number of AuD Programs',
+                    labels={'# of AuD Programs': '# of AuD Programs'}
+                )
+                fig.update_traces(
+                    marker_color='#56ab2f',
+                    marker_line=dict(color='#2d5016', width=2),
+                    opacity=0.9
+                )
+                fig.update_layout(
+                    height=400,
+                    xaxis_tickangle=-45,
+                    xaxis=dict(gridcolor='rgba(86, 171, 47, 0.1)', gridwidth=1, showgrid=True),
+                    yaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
+                    plot_bgcolor='rgba(232, 245, 233, 0.3)',
+                    paper_bgcolor='white'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+    
+    with col4:
+        st.markdown("#### Medicaid Spending per Child by State (Top 15)")
+        if 'Medicaid Spending per Child' in longterm_df.columns:
+            df_medicaid = longterm_df.dropna(subset=['Medicaid Spending per Child', 'State'])
+            df_medicaid = df_medicaid.sort_values('Medicaid Spending per Child', ascending=False).head(15)
+            if not df_medicaid.empty:
+                fig = px.bar(
+                    df_medicaid,
+                    x='State',
+                    y='Medicaid Spending per Child',
+                    title='Medicaid Spending per Child by State (Top 15)',
+                    labels={'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'}
+                )
+                fig.update_traces(
+                    marker_color='#56ab2f',
+                    marker_line=dict(color='#2d5016', width=2),
+                    opacity=0.9
+                )
+                fig.update_layout(
+                    height=400,
+                    xaxis_tickangle=-45,
+                    xaxis=dict(gridcolor='rgba(86, 171, 47, 0.1)', gridwidth=1, showgrid=True),
+                    yaxis=dict(gridcolor='rgba(86, 171, 47, 0.2)', gridwidth=1, showgrid=True),
+                    plot_bgcolor='rgba(232, 245, 233, 0.3)',
+                    paper_bgcolor='white'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+    
+    # Full data table dropdown
+    st.markdown("#### Full Long-Term Economic Data Table")
+    with st.expander("View Full Data Table", expanded=False):
+        st.dataframe(longterm_df, use_container_width=True)
+        
+except Exception as e:
+    st.error(f"Error loading long-term economic data: {e}")
 
