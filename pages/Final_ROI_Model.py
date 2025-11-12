@@ -228,12 +228,12 @@ with col2:
         hovertemplate='<b>Revenue</b><br>Year: %{x}<br>Amount: $%{y:,.2f}<extra></extra>'
     ))
     
-    # Total costs bars (yellow from palette)
+    # Total costs bars (red)
     fig_bar.add_trace(go.Bar(
         x=roi_df['Year'],
         y=roi_df['Total Costs'],
         name='Total Costs',
-        marker_color='#fde725',
+        marker_color='#d62728',  # Red
         hovertemplate='<b>Total Costs</b><br>Year: %{x}<br>Amount: $%{y:,.2f}<extra></extra>'
     ))
     
