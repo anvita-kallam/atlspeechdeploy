@@ -172,13 +172,13 @@ with col1:
     # Line chart
     fig_line = go.Figure()
     
-    # Cumulative cash flow line (blue from palette)
+    # Cumulative cash flow line (lighter blue)
     fig_line.add_trace(go.Scatter(
         x=roi_df['Year'],
         y=roi_df['Cumulative Cash Flow'],
         mode='lines+markers',
         name='Cumulative Cash Flow',
-        line=dict(color='#3b528b', width=3),
+        line=dict(color='#6b8bc7', width=3),  # Lighter blue
         marker=dict(size=10),
         hovertemplate='<b>Cumulative Cash Flow</b><br>Year: %{x}<br>Amount: $%{y:,.2f}<extra></extra>'
     ))
