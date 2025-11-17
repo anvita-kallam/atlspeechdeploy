@@ -589,7 +589,7 @@ with st.expander("View Correlation Data Table", expanded=False):
 # Medicaid Spending vs 3 Month Benchmark
 st.markdown("<div class='section-header'>Medicaid Spending per Child vs. 3 Month Benchmark</div>", unsafe_allow_html=True)
 
-# Prepare data
+# Prepare data - paired row by row as provided
 medicaid_spending = [
     3419, 3370, 5332, 2884, 3727, 4020, 3839, 4005, 3510, 3329, 4695, 2680, 3387, 3943, 3999, 3898, 4118, 3261, 4682, 3589,
     2087, 3343, 3763, 2970, 3431, 4593, 4182, 3777, 3741, 4320, 5199, 3716, 3829, 3822, 3518, 3020, 5911, 5242, 5145, 2747,
@@ -602,10 +602,13 @@ meeting_3 = [
     16.0, 10.9, 24.3, 22.8, 79.4, 82.8, 48.8, 26.5, 50.6, 35.8, 73.7
 ]
 
+# Pair them up - take the minimum length to ensure proper pairing
+min_len = min(len(medicaid_spending), len(meeting_3))
+
 # Create DataFrame and remove null values
 medicaid_benchmark_df = pd.DataFrame({
-    'Medicaid Spending per Child': medicaid_spending[:len(meeting_3)],
-    '3 month benchmark': meeting_3
+    'Medicaid Spending per Child': medicaid_spending[:min_len],
+    '3 month benchmark': meeting_3[:min_len]
 })
 
 # Remove rows with null values
