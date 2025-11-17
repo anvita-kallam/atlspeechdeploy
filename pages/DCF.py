@@ -69,38 +69,52 @@ def create_dcf_data():
     df['Total Costs'] = df['Total Wages'] + df['Maintenance Cost']
     
     # Calculate PV and NPV for each scenario
+    # Bear: base revenue only (no state impact)
+    # Base: base revenue + base state impact
+    # Bull: base revenue + bull state impact
     scenarios = {
         'Bear': {
-            'revenue_multiplier': [r * (bear_numeric[i] / base_numeric[i]) if base_numeric[i] != 0 else 0 
-                                   for i, r in enumerate(revenue)],
-            'npv': 277016.04
+            'revenue_multiplier': revenue,  # Just base tuition revenue
+            'npv': 277016.04,
+            'pv_revenue': [229666.13, 231234.56, 232803.00, 234371.43, 794588.80],  # From image
+            'pv_cost': [443227.19, 427018.52, 411809.85, 396601.18, 458435.86]  # From image
         },
         'Base': {
             'revenue_multiplier': [r + base_dollar[i] for i, r in enumerate(revenue)],
-            'npv': 669984.20
+            'npv': 669984.20,
+            'pv_revenue': [260448.22, 262016.66, 263585.09, 265153.53, 901087.32],  # From image
+            'pv_cost': [443227.19, 427018.52, 411809.85, 396601.18, 458435.86]  # From image
         },
         'Bull': {
             'revenue_multiplier': [r + bull_dollar[i] for i, r in enumerate(revenue)],
-            'npv': 2522548.40
+            'npv': 2522548.40,
+            'pv_revenue': [405563.79, 407132.22, 408700.66, 410269.09, 1403151.77],  # From image
+            'pv_cost': [443227.19, 427018.52, 411809.85, 396601.18, 458435.86]  # From image
         }
     }
     
-    # Calculate PV for each scenario
+    # Use PV values from image (or calculate if not provided)
     for scenario_name, scenario_data in scenarios.items():
-        pv_revenue = []
-        pv_cost = []
-        for i, year in enumerate(years):
-            # PV = FV / (1 + r)^n
-            pv_r = scenario_data['revenue_multiplier'][i] / ((1 + discount_rate) ** year)
-            pv_c = df['Total Costs'].iloc[i] / ((1 + discount_rate) ** year)
-            if i == 0:
-                # Year 1 includes upfront cost
-                pv_c += upfront_cost / (1 + discount_rate)
-            pv_revenue.append(pv_r)
-            pv_cost.append(pv_c)
-        
-        df[f'{scenario_name} PV Revenue'] = pv_revenue
-        df[f'{scenario_name} PV Cost'] = pv_cost
+        if 'pv_revenue' in scenario_data and 'pv_cost' in scenario_data:
+            # Use provided PV values from image
+            df[f'{scenario_name} PV Revenue'] = scenario_data['pv_revenue']
+            df[f'{scenario_name} PV Cost'] = scenario_data['pv_cost']
+        else:
+            # Calculate PV if not provided
+            pv_revenue = []
+            pv_cost = []
+            for i, year in enumerate(years):
+                # PV = FV / (1 + r)^n
+                pv_r = scenario_data['revenue_multiplier'][i] / ((1 + discount_rate) ** year)
+                pv_c = df['Total Costs'].iloc[i] / ((1 + discount_rate) ** year)
+                if i == 0:
+                    # Year 1 includes upfront cost
+                    pv_c += upfront_cost / (1 + discount_rate)
+                pv_revenue.append(pv_r)
+                pv_cost.append(pv_c)
+            
+            df[f'{scenario_name} PV Revenue'] = pv_revenue
+            df[f'{scenario_name} PV Cost'] = pv_cost
     
     return df, upfront_cost, sq_ft, maintenance_rate, discount_rate, scenarios
 
