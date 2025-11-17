@@ -62,7 +62,9 @@ STATE_NAME_CORRECTIONS = {
 
 # CMV-required states list
 CMV_STATES = {
-    "Connecticut", "Florida", "Iowa", "Kentucky", "New York", "Pennsylvania", "Utah", "Virginia"
+    "Minnesota", "Connecticut", "New York", "Florida", "Georgia", "Virginia", 
+    "Illinois", "Iowa", "Kentucky", "Louisiana", "Maine", "Pennsylvania", 
+    "Utah", "Texas", "Colorado"
 }
 
 
@@ -483,7 +485,7 @@ st.markdown(
 )
 
 st.markdown("<div class='page-title'>CMV-Required States: 1–3–6 Outcomes</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Connecticut, Florida, Iowa, Kentucky, New York, Pennsylvania, Utah, Virginia</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Minnesota, Connecticut, New York, Florida, Georgia, Virginia, Illinois, Iowa, Kentucky, Louisiana, Maine, Pennsylvania, Utah, Texas, Colorado</div>", unsafe_allow_html=True)
 
 # Load data
 with st.sidebar:
