@@ -532,9 +532,7 @@ with col1:
             hover_data={selected_metric: ":.2f", STANDARD_COLUMN_PROGRAM: True},
         )
         fig_box.update_layout(margin=dict(t=10, b=20, l=10, r=10), yaxis_title=f"{selected_metric} (%)", showlegend=False)
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.plotly_chart(fig_box, width='stretch')
-        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info(f"No data available for {selected_metric}.")
 
@@ -570,9 +568,7 @@ with col2:
         )
         fig_map.update_coloraxes(colorbar_title=f"{selected_metric} (%)")
         fig_map.update_layout(margin=dict(t=10, b=20, l=10, r=10))
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.plotly_chart(fig_map, width='stretch')
-        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info(f"No data available for {selected_metric} choropleth.")
 
@@ -662,9 +658,7 @@ if "Audiologists_per_100k" in cmv_df_viz.columns and selected_metric in cmv_df_v
             xaxis_title="Audiologists per 100k Population",
             yaxis_title=f"{selected_metric} (%)",
         )
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.plotly_chart(fig_scatter, width='stretch')
-        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info(f"No data available for {selected_metric} vs Audiologists per 100k.")
 elif "Audiologists_per_100k" not in cmv_df_viz.columns:
@@ -674,7 +668,6 @@ elif "Audiologists_per_100k" not in cmv_df_viz.columns:
 st.markdown("<div class='section-header'>Statistical Analysis (CMV States Only)</div>", unsafe_allow_html=True)
 stats_dict = compute_group_stats(cmv_df, selected_metric)
 
-st.markdown("<div class='card'>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
@@ -706,5 +699,3 @@ if not pd.isna(stats_dict['cohens_d']):
 if not pd.isna(stats_dict['reg_pvalue']):
     st.write(f"**Linear regression coefficient**: {stats_dict['reg_coef']:.3f}, p = {stats_dict['reg_pvalue']:.4f}")
     st.caption("Shows the association between program presence and outcome in a regression model.")
-
-st.markdown("</div>", unsafe_allow_html=True)

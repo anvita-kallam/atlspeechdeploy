@@ -577,9 +577,7 @@ with col1:
             annotations.append(dict(x=label, y=vals.mean(), xref='x', yref='y', text=f"Mean: {vals.mean():.1f}", showarrow=False, yshift=10))
             annotations.append(dict(x=label, y=vals.median(), xref='x', yref='y', text=f"Median: {vals.median():.1f}", showarrow=False, yshift=-10))
         fig_box.update_layout(annotations=annotations, showlegend=False, yaxis_title=f"{selected_metric} (%)")
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.plotly_chart(fig_box, width='stretch')
-        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info("Selected metric not found in data.")
 
@@ -599,9 +597,7 @@ with col2:
         fig_strip.update_yaxes(title=f"{selected_metric} (%)")
         fig_strip.update_xaxes(title="Program Presence (Binary)")
         fig_strip.update_layout(margin=dict(t=10, b=20, l=10, r=10))
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.plotly_chart(fig_strip, width='stretch')
-        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info("Selected metric not found in data.")
 
@@ -652,9 +648,7 @@ if (selected_metric in filtered.columns) and ("State_Code" in filtered.columns) 
     )
     fig_map.update_coloraxes(colorbar_title=f"{selected_metric} (%)")
     fig_map.update_layout(margin=dict(t=10, b=20, l=10, r=10))
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.plotly_chart(fig_map, width='stretch')
-    st.markdown("</div>", unsafe_allow_html=True)
 else:
     st.info("Choropleth unavailable: missing state codes or metric.")
 
@@ -720,9 +714,7 @@ if "Audiologists_per_100k" in filtered.columns and selected_metric in filtered.c
             xaxis_title="Audiologists per 100k Population",
             yaxis_title=f"{selected_metric} (%)",
         )
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.plotly_chart(fig_scatter, width='stretch')
-        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info(f"No data available for {selected_metric} vs Audiologists per 100k.")
 elif "Audiologists_per_100k" not in filtered.columns:
