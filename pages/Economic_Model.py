@@ -586,6 +586,90 @@ st.markdown("<div class='section-header'>Correlation Data</div>", unsafe_allow_h
 with st.expander("View Correlation Data Table", expanded=False):
     st.dataframe(corr_df, use_container_width=True)
 
+# Medicaid Spending vs 3 Month Benchmark
+st.markdown("<div class='section-header'>Medicaid Spending per Child vs. 3 Month Benchmark</div>", unsafe_allow_html=True)
+
+# Prepare data
+medicaid_spending = [
+    3419, 3370, 5332, 2884, 3727, 4020, 3839, 4005, 3510, 3329, 4695, 2680, 3387, 3943, 3999, 3898, 4118, 3261, 4682, 3589,
+    2087, 3343, 3763, 2970, 3431, 4593, 4182, 3777, 3741, 4320, 5199, 3716, 3829, 3822, 3518, 3020, 5911, 5242, 5145, 2747,
+    3394, 4144, 4471, 2586, 4843, 4930, 4003, 1690, 3904, 2888, 4232, 5843, 3821
+]
+
+meeting_3 = [
+    None, 16.1, 22.7, 18.3, 36.8, 32.0, 65.8, 6.1, 13.6, 34.6, 19.6, 66.3, 62.7, 56.4, 62.6, 49.7, 48.6, 56.2, 66.1, 73.8,
+    28.4, 69.1, 32.1, 40.1, 32.9, 52.8, 25.1, 4.3, 22.7, 42.1, 35.6, 39.9, 15.6, 30.9, 23.9, 65.2, 5.5, 68.7, 32.9, 55.3,
+    16.0, 10.9, 24.3, 22.8, 79.4, 82.8, 48.8, 26.5, 50.6, 35.8, 73.7
+]
+
+# Create DataFrame and remove null values
+medicaid_benchmark_df = pd.DataFrame({
+    'Medicaid Spending per Child': medicaid_spending[:len(meeting_3)],
+    '3 month benchmark': meeting_3
+})
+
+# Remove rows with null values
+medicaid_benchmark_df = medicaid_benchmark_df.dropna()
+
+if not medicaid_benchmark_df.empty:
+    x = medicaid_benchmark_df['3 month benchmark'].values
+    y = medicaid_benchmark_df['Medicaid Spending per Child'].values
+    
+    # Perform linear regression
+    slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+    r_squared = r_value ** 2
+    
+    # Create scatter plot
+    fig_medicaid_benchmark = px.scatter(
+        medicaid_benchmark_df,
+        x='3 month benchmark',
+        y='Medicaid Spending per Child',
+        title='Medicaid Spending per Child vs. 3 month benchmark',
+        labels={'3 month benchmark': '3 month benchmark', 'Medicaid Spending per Child': 'Medicaid Spending per Child ($)'},
+        color_discrete_sequence=['#5ec962']  # Green from palette
+    )
+    
+    # Update marker color
+    fig_medicaid_benchmark.update_traces(marker=dict(color='#5ec962', size=8, opacity=0.7))
+    
+    # Add regression line
+    x_line = np.linspace(x.min(), x.max(), 100)
+    y_line = slope * x_line + intercept
+    
+    fig_medicaid_benchmark.add_trace(
+        go.Scatter(
+            x=x_line,
+            y=y_line,
+            mode='lines',
+            name=f'Trendline for Medicaid Spending per Child R² = {r_squared:.3f}',
+            line=dict(color='#3b528b', width=2),  # Blue from palette
+            hovertemplate='<b>Trendline</b><br>3 month benchmark: %{x:.1f}<br>Medicaid Spending: $%{y:,.0f}<extra></extra>'
+        )
+    )
+    
+    fig_medicaid_benchmark.update_layout(
+        height=500,
+        showlegend=True,
+        xaxis_title='3 month benchmark',
+        yaxis_title='Medicaid Spending per Child ($)',
+        yaxis=dict(tickformat='$,.0f')
+    )
+    
+    st.plotly_chart(fig_medicaid_benchmark, use_container_width=True)
+    
+    st.write(f"**Statistical Results:**")
+    st.write(f"- R-squared: {r_squared:.3f}")
+    st.write(f"- Coefficient for 3 month benchmark: {slope:.4f}")
+    st.write(f"- P-value: {p_value:.3f}")
+    st.write(f"- Sample size: {len(medicaid_benchmark_df)}")
+    
+    st.write("**Key Takeaways:**")
+    st.write(f"- The R-squared value of {r_squared:.3f} indicates that {r_squared*100:.1f}% of the variance in Medicaid Spending per Child can be explained by the 3 month benchmark.")
+    if r_squared < 0.1:
+        st.write("- This suggests a very weak linear relationship between the two variables.")
+    if p_value > 0.05:
+        st.write(f"- The p-value of {p_value:.3f} indicates the relationship is not statistically significant.")
+
 # Long-Term Economic Data Section
 st.markdown("<div class='section-header'>Long-Term Economic Analysis</div>", unsafe_allow_html=True)
 
