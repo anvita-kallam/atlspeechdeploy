@@ -596,11 +596,11 @@ if "Audiologists_per_100k" in cmv_df_viz.columns and selected_metric in cmv_df_v
                 STANDARD_COLUMN_PROGRAM: 'first',
             })
         
-        # Separate Georgia from CMV states for trendline calculation
+        # Separate Georgia from other states for display (Georgia will be shown as star)
         tmp_cmv = tmp[tmp[STANDARD_COLUMN_STATE] != "Georgia"].copy()
         tmp_georgia = tmp[tmp[STANDARD_COLUMN_STATE] == "Georgia"].copy()
         
-        # Create scatterplot with CMV states only (Georgia will be added separately)
+        # Create scatterplot with CMV states (excluding Georgia, which will be added separately as star)
         fig_scatter = px.scatter(
             tmp_cmv,
             x="Audiologists_per_100k",
@@ -614,7 +614,7 @@ if "Audiologists_per_100k" in cmv_df_viz.columns and selected_metric in cmv_df_v
         # Remove the program presence legend items
         fig_scatter.update_traces(showlegend=False, selector=dict(type='scatter', mode='markers'))
         
-        # Highlight Georgia if present (excluded from trendline)
+        # Highlight Georgia if present (displayed as star, but included in trendline)
         if not tmp_georgia.empty:
             ga_hover = [
                 f"{row[STANDARD_COLUMN_STATE]}<br>"
@@ -626,17 +626,17 @@ if "Audiologists_per_100k" in cmv_df_viz.columns and selected_metric in cmv_df_v
                 x=tmp_georgia["Audiologists_per_100k"],
                 y=tmp_georgia[selected_metric],
                 mode='markers',
-                name='Georgia (excluded from trendline)',
+                name='Georgia (highlighted)',
                 marker=dict(size=12, symbol='star', color='orange', line=dict(width=2, color='darkorange')),
                 hovertext=ga_hover,
                 hoverinfo='text',
                 showlegend=True,
             )
         
-        # Add single OLS trendline for CMV states only (excluding Georgia)
-        if tmp_cmv.shape[0] >= 3:
-            x_vals = tmp_cmv["Audiologists_per_100k"].values
-            y_vals = tmp_cmv[selected_metric].values
+        # Add single OLS trendline for all CMV states including Georgia
+        if tmp.shape[0] >= 3:
+            x_vals = tmp["Audiologists_per_100k"].values
+            y_vals = tmp[selected_metric].values
             # Simple linear regression
             x_mean = np.mean(x_vals)
             y_mean = np.mean(y_vals)
@@ -652,7 +652,7 @@ if "Audiologists_per_100k" in cmv_df_viz.columns and selected_metric in cmv_df_v
                     x=x_trend,
                     y=y_trend,
                     mode='lines',
-                    name='OLS Trendline (CMV States only)',
+                    name='OLS Trendline (all CMV states)',
                     line=dict(color='rgba(68, 1, 84, 0.6)', width=2, dash='dash'),
                     showlegend=True,
                 )
