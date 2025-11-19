@@ -127,10 +127,9 @@ def load_longterm_data():
 
 
 def create_implementation_cost_chart(df, year_cols):
-    """Create stacked bar chart for implementation costs."""
+    """Create stacked bar chart for implementation costs showing CAPEX and OPEX Baseline."""
     # Filter to cost-related metrics
     cost_metrics = ['CAPEX (Accreditation Fees, Equipment, Build-out)', 
-                    'Total Annual Expenses',
                     'Total OPEX Baseline (Personnel $860,437 + Operating $25,000)']
     
     cost_df = df[df['Metric'].isin(cost_metrics)].copy()
@@ -141,56 +140,34 @@ def create_implementation_cost_chart(df, year_cols):
     
     # Extract values for each metric
     opex_values = []
-    total_exp_values = []
     capex_values = []
     
     for col in year_cols:
         opex_row = cost_df[cost_df['Metric'] == 'Total OPEX Baseline (Personnel $860,437 + Operating $25,000)']
-        total_exp_row = cost_df[cost_df['Metric'] == 'Total Annual Expenses']
         capex_row = cost_df[cost_df['Metric'] == 'CAPEX (Accreditation Fees, Equipment, Build-out)']
         
         opex_values.append(opex_row[col].values[0] if len(opex_row[col].values) > 0 else 0)
-        total_exp_values.append(total_exp_row[col].values[0] if len(total_exp_row[col].values) > 0 else 0)
         capex_values.append(capex_row[col].values[0] if len(capex_row[col].values) > 0 else 0)
     
-    # Create stacked bar chart
-    # Based on the data: Total Annual Expenses = OPEX Baseline + additional expenses (which includes CAPEX in some years)
-    # The chart shows: OPEX Baseline (blue, bottom), then the difference to Total Annual Expenses (red, middle), then CAPEX (yellow, top)
-    # But actually, looking at the data more carefully, Total Annual Expenses already includes CAPEX in some cases
-    # Let's calculate: Additional expenses = Total Annual Expenses - OPEX Baseline
-    # Then CAPEX goes on top of Total Annual Expenses
-    
+    # Create stacked bar chart: OPEX Baseline (blue, bottom), CAPEX (yellow/gold, top)
     fig = go.Figure()
     
-    # Bottom layer: OPEX Baseline (Dark Green)
+    # Bottom layer: OPEX Baseline (Blue)
     fig.add_trace(go.Bar(
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color='#2d5016',  # Dark green
+        marker_color='#3b528b',  # Blue from palette
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Middle layer: Additional Expenses beyond OPEX (Medium Green)
-    # This is Total Annual Expenses - OPEX Baseline
-    additional_heights = [total_exp_values[i] - opex_values[i] for i in range(len(years))]
-    fig.add_trace(go.Bar(
-        name='Total Annual Expenses',
-        x=years,
-        y=additional_heights,
-        base=opex_values,
-        marker_color='#56ab2f',  # Medium green
-        hovertemplate='<b>Total Annual Expenses</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
-    ))
-    
-    # Top layer: CAPEX (Light Green)
-    # Base is Total Annual Expenses
+    # Top layer: CAPEX (Yellow/Gold)
     fig.add_trace(go.Bar(
         name='CAPEX',
         x=years,
         y=capex_values,
-        base=total_exp_values,
-        marker_color='#a8e6cf',  # Light green
+        base=opex_values,
+        marker_color='#fde725',  # Yellow from palette
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -201,65 +178,65 @@ def create_implementation_cost_chart(df, year_cols):
         barmode='stack',
         height=500,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        yaxis=dict(range=[0, 2000000], tickformat='$,.0f')
+        yaxis=dict(range=[0, 900000], tickformat='$,.0f')
     )
     
     return fig
 
 
-def create_tuition_subsidy_chart(df, year_cols):
-    """Create combination chart for tuition revenue vs subsidy/gain."""
-    # Get tuition revenue and subsidy data
+def create_tuition_netprofit_chart(df, year_cols):
+    """Create combination chart for tuition revenue vs net profit."""
+    # Get tuition revenue and total expenses data
     tuition_row = df[df['Metric'] == 'Annual Tuition Revenue (Assumes 15 students/cohort, 66% In-State)']
-    subsidy_row = df[df['Metric'] == 'Annual Subsidy Required / (Operational Surplus)']
+    total_exp_row = df[df['Metric'] == 'Total Annual Expenses']
     
     years = [col.replace('Year ', '').split(' ')[0] for col in year_cols]
     years = [f"Year {y}" for y in years]
     
     tuition_values = [tuition_row[col].values[0] if len(tuition_row[col].values) > 0 else 0 for col in year_cols]
-    subsidy_values = [subsidy_row[col].values[0] if len(subsidy_row[col].values) > 0 else 0 for col in year_cols]
+    total_exp_values = [total_exp_row[col].values[0] if len(total_exp_row[col].values) > 0 else 0 for col in year_cols]
+    
+    # Calculate Net Profit = Tuition Revenue - Total Annual Expenses
+    net_profit_values = [tuition_values[i] - total_exp_values[i] for i in range(len(years))]
     
     # Create subplot with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Add bar chart for tuition revenue
+    # Add bar chart for tuition revenue (blue)
     fig.add_trace(
         go.Bar(
-            name="Annual Tuition Revenue",
+            name="Tuition Revenue",
             x=years,
             y=tuition_values,
-            marker_color='#5ec962',  # Green from palette
-            hovertemplate='<b>Annual Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>'
+            marker_color='#3b528b',  # Blue from palette
+            hovertemplate='<b>Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=False,
     )
     
-    # Add line chart for subsidy/gain
-    # Determine marker colors: dark purple for negative (subsidy), green for positive (gain)
-    marker_colors = ['#440154' if v < 0 else '#5ec962' for v in subsidy_values]
-    
+    # Add line chart for net profit (red with square markers)
     fig.add_trace(
         go.Scatter(
-            name="Subsidy/Gain Trend",
+            name="Net Profit",
             x=years,
-            y=subsidy_values,
+            y=net_profit_values,
             mode='lines+markers',
-            line=dict(color='#3b528b', dash='dash', width=2),  # Blue from palette
-            marker=dict(size=10, color=marker_colors, symbol='circle'),
-            hovertemplate='<b>Subsidy/Gain</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
+            line=dict(color='#d62728', width=2),  # Red
+            marker=dict(size=10, color='#d62728', symbol='square'),
+            hovertemplate='<b>Net Profit</b><br>Year: %{x}<br>Profit: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=True,
     )
     
-    # Add breakeven line at $0 as a trace so it appears in the legend
+    # Add breakeven line at $0 (yellow)
     fig.add_trace(
         go.Scatter(
-            name="Breakeven Point ($0)",
+            name="Break-even",
             x=years,
             y=[0] * len(years),
             mode='lines',
-            line=dict(color='#440154', width=2, dash='solid'),  # Dark purple from palette
-            hovertemplate='<b>Breakeven Point</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
+            line=dict(color='#fde725', width=2, dash='solid'),  # Yellow from palette
+            hovertemplate='<b>Break-even</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
             showlegend=True
         ),
         secondary_y=True,
@@ -267,11 +244,11 @@ def create_tuition_subsidy_chart(df, year_cols):
     
     # Set axis labels
     fig.update_xaxes(title_text="Year")
-    fig.update_yaxes(title_text="Annual Tuition Revenue ($)", secondary_y=False, tickformat='$,.0f', range=[0, 1000000])
-    fig.update_yaxes(title_text="Annual Subsidy Required / (Gain) ($)", secondary_y=True, tickformat='$,.0f', range=[-700000, 100000])
+    fig.update_yaxes(title_text="Annual Tuition Revenue ($)", secondary_y=False, tickformat='$,.0f', range=[0, 1200000])
+    fig.update_yaxes(title_text="Net Profit ($)", secondary_y=True, tickformat='$,.0f', range=[-800000, 600000])
     
     fig.update_layout(
-        title="Annual Tuition Revenue vs. Subsidy/Gain Over 5 Years",
+        title="Annual Tuition Revenue vs. Net Profit",
         height=500,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         hovermode='x unified'
@@ -477,10 +454,112 @@ except Exception as e:
     st.error(f"Error loading data: {e}")
     st.stop()
 
-# Implementation Costs Chart
-st.markdown("<div class='section-header'>Total State Implementation Costs of an AuD Program</div>", unsafe_allow_html=True)
-fig_impl = create_implementation_cost_chart(impl_df, year_cols)
-st.plotly_chart(fig_impl, use_container_width=True)
+# Financial Metrics Tables (Top Section)
+st.markdown("<div class='section-header'>Program Financial Projections</div>", unsafe_allow_html=True)
+
+# Prepare data for tables
+# Extract year labels from column names (e.g., "Year 1 (Start Up)" -> "Year 1 (Start Up)")
+year_labels = year_cols.copy()
+# For charts, use shorter labels
+years = [col.replace('Year ', '').split(' ')[0] for col in year_cols]
+years = [f"Year {y}" for y in years]
+
+# Get key metrics for the financial metrics table
+capex_row = impl_df[impl_df['Metric'] == 'CAPEX (Accreditation Fees, Equipment, Build-out)']
+opex_row = impl_df[impl_df['Metric'] == 'Total OPEX Baseline (Personnel $860,437 + Operating $25,000)']
+total_exp_row = impl_df[impl_df['Metric'] == 'Total Annual Expenses']
+tuition_row = impl_df[impl_df['Metric'] == 'Annual Tuition Revenue (Assumes 15 students/cohort, 66% In-State)']
+subsidy_row = impl_df[impl_df['Metric'] == 'Annual Subsidy Required / (Operational Surplus)']
+
+# Create Financial Metrics Table (Left)
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("#### Financial Metrics over 5 Years")
+    financial_metrics_data = {
+        'Metric': [
+            'CAPEX (Accreditation Fees)',
+            'Total OPEX Baseline (Persc)',
+            'Total Annual Expenses',
+            'Annual Tuition Revenue (A)',
+            'Annual Subsidy Required / (Operational Surplus)'
+        ]
+    }
+    
+    # Add year columns
+    for i, col in enumerate(year_cols):
+        financial_metrics_data[year_labels[i]] = [
+            capex_row[col].values[0] if len(capex_row[col].values) > 0 else 0,
+            opex_row[col].values[0] if len(opex_row[col].values) > 0 else 0,
+            total_exp_row[col].values[0] if len(total_exp_row[col].values) > 0 else 0,
+            tuition_row[col].values[0] if len(tuition_row[col].values) > 0 else 0,
+            subsidy_row[col].values[0] if len(subsidy_row[col].values) > 0 else 0
+        ]
+    
+    financial_metrics_df = pd.DataFrame(financial_metrics_data)
+    
+    # Format the table with colors for subsidy row
+    display_financial = financial_metrics_df.copy()
+    for i, col in enumerate(year_labels):
+        # Format subsidy row (last row) with colors
+        subsidy_val = display_financial.iloc[4, i+1]
+        if pd.notna(subsidy_val):
+            try:
+                num_val = float(subsidy_val)
+                if num_val < 0:
+                    display_financial.iloc[4, i+1] = f'<span style="color: #d62728; font-weight: bold;">${num_val:,.0f}</span>'
+                elif num_val > 0:
+                    display_financial.iloc[4, i+1] = f'<span style="color: #2ca02c; font-weight: bold;">${num_val:,.0f}</span>'
+                else:
+                    display_financial.iloc[4, i+1] = f'${num_val:,.0f}'
+            except:
+                pass
+        # Format other rows
+        for row_idx in range(4):
+            val = display_financial.iloc[row_idx, i+1]
+            if pd.notna(val) and isinstance(val, (int, float)):
+                display_financial.iloc[row_idx, i+1] = f'${val:,.0f}'
+    
+    st.markdown(display_financial.to_html(escape=False, index=False, classes='dataframe'), unsafe_allow_html=True)
+
+with col2:
+    st.markdown("#### Summary of Tuition Revenue, Net Profit, and Break-even")
+    
+    # Calculate Net Profit = Tuition Revenue - Total Annual Expenses
+    tuition_values = [tuition_row[col].values[0] if len(tuition_row[col].values) > 0 else 0 for col in year_cols]
+    total_exp_values = [total_exp_row[col].values[0] if len(total_exp_row[col].values) > 0 else 0 for col in year_cols]
+    net_profit_values = [tuition_values[i] - total_exp_values[i] for i in range(len(years))]
+    
+    summary_data = {
+        'Year': years,  # Use shorter labels like "Year 1", "Year 2", etc.
+        'Tuition Revenue': tuition_values,
+        'Net Profit': net_profit_values,
+        'Break-even': [0] * len(years)
+    }
+    
+    summary_df = pd.DataFrame(summary_data)
+    
+    # Format the summary table
+    display_summary = summary_df.copy()
+    for i in range(len(display_summary)):
+        display_summary.iloc[i, 1] = f'${display_summary.iloc[i, 1]:,.0f}'
+        display_summary.iloc[i, 2] = f'${display_summary.iloc[i, 2]:,.0f}'
+        display_summary.iloc[i, 3] = f'{display_summary.iloc[i, 3]:.0f}'
+    
+    st.markdown(display_summary.to_html(escape=False, index=False, classes='dataframe'), unsafe_allow_html=True)
+
+# Charts (Bottom Section)
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("<div class='section-header'>Total State Implementation Costs of an AuD Program</div>", unsafe_allow_html=True)
+    fig_impl = create_implementation_cost_chart(impl_df, year_cols)
+    st.plotly_chart(fig_impl, use_container_width=True)
+
+with col2:
+    st.markdown("<div class='section-header'>Annual Tuition Revenue vs. Net Profit</div>", unsafe_allow_html=True)
+    fig_tuition = create_tuition_netprofit_chart(impl_df, year_cols)
+    st.plotly_chart(fig_tuition, use_container_width=True)
 
 # Display implementation data table with color formatting
 with st.expander("View Implementation Data Table", expanded=False):
@@ -491,10 +570,10 @@ with st.expander("View Implementation Data Table", expanded=False):
     subsidy_mask = display_df['Metric'] == 'Annual Subsidy Required / (Operational Surplus)'
     if subsidy_mask.any():
         # Get year columns
-        year_cols = [col for col in display_df.columns if 'Year' in col]
+        year_cols_display = [col for col in display_df.columns if 'Year' in col]
         
         # Format the subsidy values with colors
-        for col in year_cols:
+        for col in year_cols_display:
             if col in display_df.columns:
                 val = display_df.loc[subsidy_mask, col].values[0]
                 if pd.notna(val):
@@ -510,23 +589,18 @@ with st.expander("View Implementation Data Table", expanded=False):
                             display_df.loc[subsidy_mask, col] = f'${num_val:,.0f}'
                     except:
                         pass
-    
-    # Format other numeric columns for display
-    for col in year_cols:
-        if col in display_df.columns:
-            for idx in display_df.index:
-                if not subsidy_mask.loc[idx]:  # Only format non-subsidy rows
-                    val = display_df.loc[idx, col]
-                    if pd.notna(val) and isinstance(val, (int, float)):
-                        display_df.loc[idx, col] = f'${val:,.0f}'
-    
-    # Display with HTML rendering
-    st.markdown(display_df.to_html(escape=False, index=False, classes='dataframe'), unsafe_allow_html=True)
-
-# Tuition Revenue vs Subsidy/Gain Chart
-st.markdown("<div class='section-header'>Annual Tuition Revenue vs. Subsidy/Gain Over 5 Years</div>", unsafe_allow_html=True)
-fig_tuition = create_tuition_subsidy_chart(impl_df, year_cols)
-st.plotly_chart(fig_tuition, use_container_width=True)
+        
+        # Format other numeric columns for display
+        for col in year_cols_display:
+            if col in display_df.columns:
+                for idx in display_df.index:
+                    if not subsidy_mask.loc[idx]:  # Only format non-subsidy rows
+                        val = display_df.loc[idx, col]
+                        if pd.notna(val) and isinstance(val, (int, float)):
+                            display_df.loc[idx, col] = f'${val:,.0f}'
+        
+        # Display with HTML rendering
+        st.markdown(display_df.to_html(escape=False, index=False, classes='dataframe'), unsafe_allow_html=True)
 
 # Correlation Analysis
 st.markdown("<div class='section-header'>Spending per Child vs. Total AuD Program Enrollment</div>", unsafe_allow_html=True)
