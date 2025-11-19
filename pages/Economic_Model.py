@@ -151,7 +151,7 @@ def create_implementation_cost_chart():
         x=years,
         y=capex_values,
         base=opex_values,
-        marker_color='#80b048',  # Light green
+        marker_color='#b1d28a',  # Light green
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
