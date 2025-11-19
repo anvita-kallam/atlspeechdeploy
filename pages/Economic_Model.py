@@ -133,25 +133,25 @@ def create_implementation_cost_chart():
     capex_values = [438250, 15000, 0, 5082, 0]  # From image
     opex_values = [459600, 459600, 459600, 549600, 549600]  # From image
     
-    # Create stacked bar chart: OPEX Baseline (purple, bottom), CAPEX (green, top) - Viridis colors
+    # Create stacked bar chart: OPEX Baseline (dark green, bottom), CAPEX (light green, top) - shades of green
     fig = go.Figure()
     
-    # Bottom layer: OPEX Baseline (Purple - Viridis)
+    # Bottom layer: OPEX Baseline (Dark Green)
     fig.add_trace(go.Bar(
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color='#440154',  # Purple - Viridis
+        marker_color='#2d5016',  # Dark green
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Top layer: CAPEX (Green - Viridis)
+    # Top layer: CAPEX (Light Green)
     fig.add_trace(go.Bar(
         name='CAPEX',
         x=years,
         y=capex_values,
         base=opex_values,
-        marker_color='#5ec962',  # Green - Viridis
+        marker_color='#a8e6cf',  # Light green
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
