@@ -356,7 +356,7 @@ with col2:
 
 # Facility Information
 st.markdown("<div class='section-header'>Facility Information</div>", unsafe_allow_html=True)
-st.info("**Space estimate:** Increased to 10,000 sq ft to account for university needs including classrooms, student work areas, faculty offices, storage, and circulation space, which typically double the footprint of a standalone clinic.")
+st.info("**Space estimate:** Space estimate increased to 10,000 sq ft to account for university needs including classrooms, student work areas, faculty offices, storage, and circulation space, which typically double the footprint of a standalone clinic.")
 
 # State Revenue Impact
 st.markdown("<div class='section-header'>State Revenue Impact Scenarios</div>", unsafe_allow_html=True)
