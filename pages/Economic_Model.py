@@ -133,25 +133,25 @@ def create_implementation_cost_chart():
     capex_values = [438250, 15000, 0, 5082, 0]  # From image
     opex_values = [459600, 459600, 459600, 549600, 549600]  # From image
     
-    # Create stacked bar chart: OPEX Baseline (green, bottom), CAPEX (yellow/gold, top)
+    # Create stacked bar chart: OPEX Baseline (blue, bottom), CAPEX (yellow, top) - Viridis colors
     fig = go.Figure()
     
-    # Bottom layer: OPEX Baseline (Green - original palette)
+    # Bottom layer: OPEX Baseline (Blue - Viridis)
     fig.add_trace(go.Bar(
         name='Total OPEX Baseline',
         x=years,
         y=opex_values,
-        marker_color='#2d5016',  # Dark green - original palette
+        marker_color='#3b528b',  # Blue - Viridis
         hovertemplate='<b>Total OPEX Baseline</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Top layer: CAPEX (Yellow/Gold)
+    # Top layer: CAPEX (Yellow - Viridis)
     fig.add_trace(go.Bar(
         name='CAPEX',
         x=years,
         y=capex_values,
         base=opex_values,
-        marker_color='#fde725',  # Yellow from palette
+        marker_color='#fde725',  # Yellow - Viridis
         hovertemplate='<b>CAPEX</b><br>Year: %{x}<br>Amount: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -178,40 +178,40 @@ def create_tuition_netprofit_chart():
     # Create subplot with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Add bar chart for tuition revenue (green - original palette)
+    # Add bar chart for tuition revenue (green - Viridis)
     fig.add_trace(
         go.Bar(
             name="Tuition Revenue",
             x=years,
             y=tuition_values,
-            marker_color='#56ab2f',  # Green - original palette
+            marker_color='#5ec962',  # Green - Viridis
             hovertemplate='<b>Tuition Revenue</b><br>Year: %{x}<br>Revenue: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=False,
     )
     
-    # Add line chart for net profit (red with square markers)
+    # Add line chart for net profit (teal - Viridis)
     fig.add_trace(
         go.Scatter(
             name="Net Profit",
             x=years,
             y=net_profit_values,
             mode='lines+markers',
-            line=dict(color='#d62728', width=2),  # Red
-            marker=dict(size=10, color='#d62728', symbol='square'),
+            line=dict(color='#21918c', width=2),  # Teal - Viridis
+            marker=dict(size=10, color='#21918c', symbol='square'),
             hovertemplate='<b>Net Profit</b><br>Year: %{x}<br>Profit: $%{y:,.0f}<extra></extra>'
         ),
         secondary_y=True,
     )
     
-    # Add breakeven line at $0 (yellow)
+    # Add breakeven line at $0 (yellow - Viridis)
     fig.add_trace(
         go.Scatter(
             name="Break-even",
             x=years,
             y=[0] * len(years),
             mode='lines',
-            line=dict(color='#fde725', width=2, dash='solid'),  # Yellow from palette
+            line=dict(color='#fde725', width=2, dash='solid'),  # Yellow - Viridis
             hovertemplate='<b>Break-even</b><br>Year: %{x}<br>Amount: $0<extra></extra>',
             showlegend=True
         ),
